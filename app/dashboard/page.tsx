@@ -87,8 +87,11 @@ export default async function DashboardPage() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          <h1 className="text-4xl font-black text-white">
+          <h1 className="text-4xl font-black text-white flex items-center gap-4">
             Bienvenue, {profile?.full_name || "Trader"} 👋
+            <span className="bg-yellow-400 text-black text-xs px-3 py-1 rounded-full font-bold animate-pulse">
+              MODE TEST ACTIF (SANS PAYWALL)
+            </span>
           </h1>
           <p className="text-white text-opacity-90 mt-2 text-lg font-semibold">
             Gérez vos comptes MT5 et suivez vos trades

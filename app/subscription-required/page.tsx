@@ -24,16 +24,22 @@ export default function SubscriptionRequiredPage() {
       return
     }
 
+    // TEMPORARY BYPASS FOR TESTING: Always redirect to dashboard
+    router.push('/dashboard')
+    return
+
+    /*
     // Vérifier si l'utilisateur a un abonnement actif
     const { data: subscription } = await supabase
       .from('subscriptions')
       .select('status')
       .eq('user_id', session.user.id)
       .single()
-
+ 
     if (subscription?.status === 'active' || subscription?.status === 'trialing') {
       router.push('/dashboard')
     }
+    */
   }
 
   const activateSubscription = async (plan: 'monthly' | 'yearly') => {
