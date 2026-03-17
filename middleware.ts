@@ -38,6 +38,7 @@ export async function middleware(req: NextRequest) {
 
     // Les admins n'ont pas besoin d'abonnement
     if (!profile?.is_admin) {
+      /* TEMPORARILY DISABLED FOR TESTING
       // Récupérer l'abonnement
       const { data: subscription } = await supabase
         .from('subscriptions')
@@ -49,6 +50,7 @@ export async function middleware(req: NextRequest) {
       if (!subscription || (subscription?.status !== 'active' && subscription?.status !== 'trialing')) {
         return NextResponse.redirect(new URL('/subscription-required', req.url))
       }
+      */
     }
   }
 
