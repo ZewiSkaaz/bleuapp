@@ -33,6 +33,9 @@ METAAPI_TOKEN=ton_token_metaapi
 NEXT_PUBLIC_APP_URL=https://sadek-bot-saas.onrender.com
 ```
 **⚠️ Important:** Remplace par l'URL réelle générée par Render après le premier déploiement, puis redéploie.
+Pour les configurations nécessitant une URL de redirection (par exemple, OAuth), utilise :
+- **Site URL** : `https://bleuapp.onrender.com`
+- **Redirect URLs** : `https://bleuapp.onrender.com/**`
 
 ---
 
@@ -64,6 +67,8 @@ METAAPI_TOKEN=ton_token_metaapi
 
 - **Ne jamais commit** ces valeurs dans Git
 - Utiliser les clés **LIVE** pour la production (pas test)
+- Pour les configurations nécessitant une URL de redirection (par exemple, OAuth):
+    - **Site URL**: `https://bleuapp.onrender.com`
+    - **Redirect URLs**: `https://bleuapp.onrender.com/**`
 - `STRIPE_WEBHOOK_SECRET` sera disponible après avoir créé le webhook dans Stripe
 - `NEXT_PUBLIC_APP_URL` doit être mis à jour après le premier déploiement
-
