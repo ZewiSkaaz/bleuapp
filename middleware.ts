@@ -38,19 +38,8 @@ export async function middleware(req: NextRequest) {
 
     // Les admins n'ont pas besoin d'abonnement
     if (!profile?.is_admin) {
-      /* TEMPORARILY DISABLED FOR TESTING
-      // Récupérer l'abonnement
-      const { data: subscription } = await supabase
-        .from('subscriptions')
-        .select('status')
-        .eq('user_id', session.user.id)
-        .single()
-      
-      // Rediriger vers le paywall si pas d'abonnement actif
-      if (!subscription || (subscription?.status !== 'active' && subscription?.status !== 'trialing')) {
-        return NextResponse.redirect(new URL('/subscription-required', req.url))
-      }
-      */
+      // TEMPORARILY DISABLED FOR TESTING
+      // return NextResponse.redirect(new URL('/subscription-required', req.url))
     }
   }
 
