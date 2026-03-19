@@ -33,6 +33,12 @@ export async function POST(req: Request) {
     }
 
     const productId = PRODUCT_IDS[plan as keyof typeof PRODUCT_IDS] || PRODUCT_IDS.monthly
+    
+    if (!productId) {
+      return NextResponse.json({ 
+        error: `L'ID du produit Stripe (${plan}) n'est pas configuré dans les variables d'environnement (STRIPE_${plan.toUpperCase()}_PRODUCT_ID)` 
+      }, { status: 500 })
+    }
 
     // Récupérer les prix du produit
     const prices = await stripe.prices.list({
