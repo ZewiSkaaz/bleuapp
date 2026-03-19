@@ -20,9 +20,7 @@ export default async function DashboardPage() {
     .eq("id", session.user.id)
     .single();
 
-  if (profile?.is_admin) {
-    redirect("/admin/dashboard");
-  }
+  // Admins can stay on this page to test the client view.
 
   const { data: mt5Accounts } = await supabase
     .from("mt5_accounts")
@@ -83,7 +81,7 @@ export default async function DashboardPage() {
 
   return (
     <div className="min-h-screen pattern-bg">
-      <Navbar />
+      <Navbar isAdmin={profile?.is_admin} />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">

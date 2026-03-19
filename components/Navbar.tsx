@@ -26,8 +26,8 @@ export default function Navbar({ isAdmin = false }: { isAdmin?: boolean }) {
           <div className="flex items-center space-x-2 sm:space-x-4">
             {isAdmin ? (
               <>
-                <Link href="/admin/dashboard" className="text-white hover:text-white hover:opacity-80 font-bold px-3 py-2 rounded-lg transition-all">
-                  Dashboard
+                <Link href="/admin/dashboard" className="text-white hover:text-white hover:opacity-80 font-bold px-3 py-2 rounded-lg transition-all border border-white/20 bg-white/10">
+                  Administration
                 </Link>
                 <Link href="/admin/mt5-accounts" className="text-white hover:text-white hover:opacity-80 font-bold px-3 py-2 rounded-lg transition-all">
                   Comptes MT5
