@@ -16,6 +16,8 @@ SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 STRIPE_SECRET_KEY=sk_live_REDACTED
 NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_live_REDACTED
 STRIPE_WEBHOOK_SECRET=whsec_... (à récupérer après configuration du webhook Stripe)
+STRIPE_MONTHLY_PRODUCT_ID=prod_... (votre nouveau produit mensuel)
+STRIPE_YEARLY_PRODUCT_ID=prod_... (votre nouveau produit annuel)
 ```
 
 ### Telegram

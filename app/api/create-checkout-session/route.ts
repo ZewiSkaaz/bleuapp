@@ -26,10 +26,10 @@ export async function POST(req: Request) {
       .eq('id', session.user.id)
       .single()
 
-    // Produits Stripe
+    // Produits Stripe (depuis les variables d'environnement)
     const PRODUCT_IDS = {
-      monthly: 'prod_TOJi07OHG8AVUc', // Plan Basic Mensuel
-      yearly: 'prod_TOJkO0xDiqmvZn',  // Plan Basic Annuel
+      monthly: process.env.STRIPE_MONTHLY_PRODUCT_ID, // Plan Basic Mensuel
+      yearly: process.env.STRIPE_YEARLY_PRODUCT_ID,   // Plan Basic Annuel
     }
 
     const productId = PRODUCT_IDS[plan as keyof typeof PRODUCT_IDS] || PRODUCT_IDS.monthly
