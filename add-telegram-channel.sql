@@ -4,8 +4,8 @@
 -- Insérer le canal L'IMPRIMANTE
 INSERT INTO public.telegram_channels (id, username, name, description, is_premium, created_at)
 VALUES (
-  'limprimante-channel-id',
-  'limprimante',
+  'bleuapp-channel-id',
+  'bleuapp_canal',
   'L''IMPRIMANTE',
   'Canal officiel L''IMPRIMANTE - Signaux de trading premium',
   true,
@@ -17,4 +17,4 @@ ON CONFLICT (username) DO UPDATE SET
   is_premium = EXCLUDED.is_premium;
 
 -- Vérifier l'insertion
-SELECT * FROM public.telegram_channels WHERE username = 'limprimante';
+SELECT * FROM public.telegram_channels WHERE username = 'bleuapp_canal';

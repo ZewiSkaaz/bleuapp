@@ -33,7 +33,7 @@ OPENAI_API_KEY=sk-...
 
 ### App URL
 ```
-NEXT_PUBLIC_APP_URL=https://sadek-saas.vercel.app
+NEXT_PUBLIC_APP_URL=https://bleuapp.onrender.com
 ```
 
 ---
@@ -69,7 +69,7 @@ METAAPI_TOKEN=eyJhbGciOiJSUzUxMiIsInR5cCI6IkpXVCJ9...
 
 ### 2. Configurer le webhook Telegram pour le canal de test:
 ```bash
-curl -X POST "https://api.telegram.org/botTELEGRAM_BOT_TOKEN_REDACTED/setWebhook?url=https://sadek-saas.vercel.app/api/telegram/webhook"
+curl -X POST "https://api.telegram.org/botTELEGRAM_BOT_TOKEN_REDACTED/setWebhook?url=https://bleuapp.onrender.com/api/telegram/webhook"
 ```
 
 ### 3. Vérifier le webhook:
@@ -132,7 +132,7 @@ WHERE channel_id = (SELECT id FROM telegram_channels WHERE username = 'imprimbot
 
 2. **Configurer le webhook:**
    ```bash
-   curl -X POST "https://api.telegram.org/botTELEGRAM_BOT_TOKEN_REDACTED/setWebhook?url=https://sadek-saas.vercel.app/api/telegram/webhook"
+   curl -X POST "https://api.telegram.org/botTELEGRAM_BOT_TOKEN_REDACTED/setWebhook?url=https://bleuapp.onrender.com/api/telegram/webhook"
    ```
 
 3. **Envoyer un message de test:**

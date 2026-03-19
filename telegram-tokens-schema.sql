@@ -58,10 +58,10 @@ INSERT INTO public.telegram_bot_tokens (channel_id, bot_token, bot_username, is_
 SELECT 
   tc.id,
   '8496815756:AAEFOf60xHTGEWlXWtzgSIMwNJzwDhCra4M',
-  'limprimante_bot',
+  'bleuapp_bot',
   true
 FROM public.telegram_channels tc
-WHERE tc.username = 'limprimante'
+WHERE tc.username = 'bleuapp_canal'
 ON CONFLICT (channel_id) DO UPDATE SET
   bot_token = EXCLUDED.bot_token,
   bot_username = EXCLUDED.bot_username,
@@ -76,4 +76,4 @@ SELECT
   tbt.is_active
 FROM public.telegram_channels tc
 LEFT JOIN public.telegram_bot_tokens tbt ON tc.id = tbt.channel_id
-WHERE tc.username = 'limprimante';
+WHERE tc.username = 'bleuapp_canal';

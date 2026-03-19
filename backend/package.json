@@ -1,5 +1,5 @@
 {
-  "name": "limprimante-backend",
+  "name": "bleuapp-backend",
   "version": "1.0.0",
   "description": "Backend service for L'IMPRIMANTE copy trading",
   "main": "dist/server.js",

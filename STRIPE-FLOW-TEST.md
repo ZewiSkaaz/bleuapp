@@ -14,7 +14,7 @@ Vérifier que toutes ces variables sont configurées avec les clés **LIVE** :
 STRIPE_SECRET_KEY=sk_live_REDACTED
 NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_live_REDACTED
 STRIPE_WEBHOOK_SECRET=whsec_... (secret du webhook LIVE)
-NEXT_PUBLIC_APP_URL=https://sadek-saas.vercel.app
+NEXT_PUBLIC_APP_URL=https://bleuapp.onrender.com
 ```
 
 **⚠️ Vérifier que les clés commencent par `sk_live_` et `pk_live_` (pas `sk_test_` ou `pk_test_`)**
@@ -22,7 +22,7 @@ NEXT_PUBLIC_APP_URL=https://sadek-saas.vercel.app
 ### 2. Webhook Stripe Configuré (LIVE)
 
 - **Mode:** LIVE (pas test!)
-- URL: `https://sadek-saas.vercel.app/api/webhook`
+- URL: `https://bleuapp.onrender.com/api/webhook`
 - Événements:
   - ✅ `checkout.session.completed`
   - ✅ `customer.subscription.updated`
@@ -42,7 +42,7 @@ NEXT_PUBLIC_APP_URL=https://sadek-saas.vercel.app
 
 ### Étape 1: Créer un Compte Test
 
-1. Aller sur `https://sadek-saas.vercel.app/auth/signup`
+1. Aller sur `https://bleuapp.onrender.com/auth/signup`
 2. Créer un compte avec un email test
 3. Vérifier que tu es redirigé vers `/subscription-required`
 

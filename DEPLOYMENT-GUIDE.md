@@ -1,4 +1,4 @@
-# 🚀 Guide de Déploiement Complet - L'IMPRIMANTE
+# 🚀 Guide de Déploiement Complet - bleuapp
 
 ## Architecture
 
@@ -76,7 +76,7 @@ Clique **"Redeploy"** après avoir ajouté les variables.
 
 ### B. Configuration
 
-**Name:** `limprimante-backend`
+**Name:** `lbleuapp-backend`
 
 **Root Directory:**
 ```
@@ -122,16 +122,16 @@ Clique **"Create Web Service"**
 
 Render va build et déployer. Ça prend 2-3 minutes.
 
-**✅ Backend déployé:** `https://limprimante-backend.onrender.com`
+**✅ Backend déployé:** `https://lbleuapp-backend.onrender.com`
 
 ### E. Vérifier que Ça Marche
 
 ```bash
 # Health check
-curl https://limprimante-backend.onrender.com/health
+curl https://lbleuapp-backend.onrender.com/health
 
 # Vérifier le statut
-curl https://limprimante-backend.onrender.com/api/status
+curl https://lbleuapp-backend.onrender.com/api/status
 ```
 
 Tu devrais voir:
@@ -183,7 +183,7 @@ Dans **SQL Editor**:
 
 ### B. Backend
 
-1. Va sur `https://limprimante-backend.onrender.com/health`
+1. Va sur `https://lbleuapp-backend.onrender.com/health`
 2. Vérifie que `"monitoring": true`
 3. Regarde les logs dans Render Dashboard
 
@@ -251,7 +251,7 @@ Render Dashboard → Ton service → **Logs**
 
 Tu verras:
 ```
-🚀 L'IMPRIMANTE Copy Trading Backend
+🚀 bleuapp Copy Trading Backend
 ✅ Server running on port 4000
 🔄 Auto-starting monitoring...
 📊 Monitoring du compte admin: 123456789

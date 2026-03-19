@@ -18,7 +18,7 @@ Exécute ces scripts dans l'ordre dans Supabase SQL Editor :
 
 ```bash
 # Exécuter le script de configuration du webhook
-node setup-telegram-webhook-limprimante.js
+node setup-telegram-webhook-bleuapp.js
 ```
 
 ### 3. **Variables d'environnement**
@@ -65,7 +65,7 @@ curl "https://api.telegram.org/botTELEGRAM_BOT_TOKEN_REDACTED/getWebhookInfo"
 
 ### Canal non trouvé
 - Vérifie que le script SQL a bien été exécuté
-- Vérifie que le nom d'utilisateur correspond (`limprimante`)
+- Vérifie que le nom d'utilisateur correspond (`bleuapp`)
 
 ### Signaux non parsés
 - Vérifie le format du message

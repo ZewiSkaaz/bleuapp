@@ -6,11 +6,11 @@ ALTER TABLE public.telegram_channels ADD CONSTRAINT telegram_channels_telegram_c
 ALTER TABLE public.telegram_signals ADD COLUMN IF NOT EXISTS order_type VARCHAR(50) DEFAULT 'MARKET';
 ALTER TABLE public.telegram_trades ADD COLUMN IF NOT EXISTS order_type VARCHAR(50) DEFAULT 'MARKET';
 
--- 2. CONFIGURATION DU CANAL "L’IMPRIMANTE VIP"
+-- 2. CONFIGURATION DU CANAL "bleuapp VIP"
 UPDATE public.telegram_channels
-SET telegram_chat_id = -1002313602819,
+SET telegram_chat_id = -1000000000000,
     is_active = true
-WHERE name ILIKE '%L’imprimante VIP%';
+WHERE name ILIKE '%BleuApp VIP Canal%';
 
 -- 3. VÉRIFICATION DES ABONNEMENTS (TRÈS IMPORTANT)
 -- Cela affiche si des utilisateurs sont réellement abonnés à ce canal
@@ -19,7 +19,7 @@ SELECT
     COUNT(uts.id) as nb_utilisateurs_lies
 FROM telegram_channels tc
 LEFT JOIN user_telegram_subscriptions uts ON tc.id = uts.channel_id
-WHERE tc.telegram_chat_id = -1002313602819
+WHERE tc.telegram_chat_id = -1000000000000 -- Remplacez par votre vrai chat_id
 GROUP BY tc.name;
 
 -- 4. VÉRIFICATION DES COMPTES MT5

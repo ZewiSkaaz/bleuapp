@@ -22,7 +22,7 @@
 3. Clique sur ton projet
 4. En haut de la page, tu verras l'URL, par exemple :
    ```
-   https://sadek-saas.vercel.app
+   https://bleuapp.onrender.com
    ```
    ou
    ```
@@ -40,7 +40,7 @@ curl -X POST "https://api.telegram.org/botTELEGRAM_BOT_TOKEN_REDACTED/setWebhook
 **Exemple :**
 ```bash
 curl -X POST "https://api.telegram.org/botTELEGRAM_BOT_TOKEN_REDACTED/setWebhook" \
-  -d "url=https://sadek-saas.vercel.app/api/telegram/webhook"
+  -d "url=https://bleuapp.onrender.com/api/telegram/webhook"
 ```
 
 ---

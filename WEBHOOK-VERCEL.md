@@ -15,7 +15,7 @@
 3. Clique sur ton projet (ex: `sadek-saas`)
 4. En haut de la page, tu verras l'URL :
    ```
-   https://sadek-saas.vercel.app
+   https://bleuapp.onrender.com
    ```
    ou
    ```
@@ -36,11 +36,11 @@ curl -X POST "https://api.telegram.org/botTELEGRAM_BOT_TOKEN_REDACTED/setWebhook
 
 **Remplace `TON-URL-VERCEL.vercel.app` par ta vraie URL Vercel.**
 
-**Exemple si ton URL est `https://sadek-saas.vercel.app` :**
+**Exemple si ton URL est `https://bleuapp.onrender.com` :**
 
 ```bash
 curl -X POST "https://api.telegram.org/botTELEGRAM_BOT_TOKEN_REDACTED/setWebhook" \
-  -d "url=https://sadek-saas.vercel.app/api/telegram/webhook"
+  -d "url=https://bleuapp.onrender.com/api/telegram/webhook"
 ```
 
 **Résultat attendu :**
