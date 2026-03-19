@@ -1,5 +1,5 @@
 import { createServerClient } from '@/lib/supabase/server'
-import { NextResponse } from 'next/response'
+import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 
 // Helper to get service role client for admin tasks
