@@ -33,11 +33,7 @@ export default async function AdminUsersPage() {
         <p className="text-slate-400">Ajoutez, modifiez ou supprimez des membres de votre SaaS directement ici.</p>
       </div>
 
-      <div className="glass-panel overflow-hidden">
-        <div className="overflow-x-auto">
-          <UsersTableClient initialUsers={users || []} />
-        </div>
-      </div>
+      <UsersTableClient initialUsers={users || []} />
     </div>
   )
 }
