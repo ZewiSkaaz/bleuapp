@@ -91,110 +91,131 @@ export default function SubscriptionPage() {
   const isActive = subscription?.status === 'active' || subscription?.status === 'trialing'
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen pattern-bg">
       <Navbar />
       
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">Abonnement</h1>
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="text-center mb-12">
+          <h1 className="text-5xl font-black text-white mb-4">Abonnement BleuApp</h1>
+          <div className="h-1 w-24 bg-white mx-auto mb-6"></div>
+          <p className="text-xl text-white text-opacity-80">
+            Choisissez votre plan pour activer le copy-trading instantané
+          </p>
+        </div>
 
-        <div className="grid md:grid-cols-2 gap-6">
-          <div className="card">
-            <h2 className="text-xl font-bold mb-4">Statut Actuel</h2>
-            
-            <div className="space-y-3">
-              <div>
-                <p className="text-sm text-gray-600">Statut</p>
-                <p className="text-lg font-semibold">
-                  {subscription?.status === 'active' && (
-                    <span className="text-green-600">Actif</span>
-                  )}
-                  {subscription?.status === 'trialing' && (
-                    <span className="text-blue-600">Période d'essai</span>
-                  )}
-                  {subscription?.status === 'inactive' && (
-                    <span className="text-red-600">Inactif</span>
-                  )}
-                  {subscription?.status === 'canceled' && (
-                    <span className="text-orange-600">Annulé</span>
-                  )}
-                  {subscription?.status === 'past_due' && (
-                    <span className="text-red-600">Paiement en retard</span>
-                  )}
-                </p>
+        <div className="grid md:grid-cols-2 gap-8">
+          {/* Statut Card */}
+          <div className="card-white flex flex-col justify-between">
+            <div>
+              <h2 className="text-2xl font-black mb-6" style={{ color: '#1d4ed8' }}>Votre État Actuel</h2>
+              
+              <div className="space-y-6">
+                <div className="bg-gray-50 p-6 rounded-2xl border-2 border-dashed border-gray-200">
+                  <p className="text-sm font-bold uppercase tracking-wider text-gray-400 mb-1">Statut du compte</p>
+                  <p className="text-3xl font-black">
+                    {subscription?.status === 'active' && (
+                      <span className="text-green-600">✅ ACTIF</span>
+                    )}
+                    {subscription?.status === 'trialing' && (
+                      <span className="text-blue-600">💎 ESSAI</span>
+                    )}
+                    {!isActive && subscription?.status !== 'trialing' && (
+                      <span className="text-red-600">❌ INACTIF</span>
+                    )}
+                  </p>
+                </div>
+
+                {subscription?.current_period_end && (
+                  <div className="bg-gray-50 p-6 rounded-2xl">
+                    <p className="text-sm font-bold uppercase tracking-wider text-gray-400 mb-1">Prochaine échéance</p>
+                    <p className="text-2xl font-black text-gray-800">
+                      {new Date(subscription.current_period_end).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
+                    </p>
+                  </div>
+                )}
               </div>
+            </div>
 
-              {subscription?.current_period_end && (
-                <div>
-                  <p className="text-sm text-gray-600">Fin de période</p>
-                  <p className="text-lg font-semibold">
-                    {new Date(subscription.current_period_end).toLocaleDateString('fr-FR')}
+            <div className="mt-8">
+              {isActive ? (
+                <button
+                  onClick={handleManageSubscription}
+                  disabled={loading}
+                  className="btn btn-primary w-full py-4 text-lg"
+                >
+                  {loading ? '⏳ Chargement...' : '⚙️ Gérer mon abonnement'}
+                </button>
+              ) : (
+                <div className="bg-blue-50 p-6 rounded-2xl border-2 border-blue-100">
+                  <p className="text-blue-800 font-bold text-center">
+                    Sélectionnez un plan à droite pour débloquer toutes les fonctionnalités.
                   </p>
                 </div>
               )}
             </div>
+          </div>
 
-            {isActive ? (
-              <button
-                onClick={handleManageSubscription}
-                disabled={loading}
-                className="btn btn-secondary w-full mt-6"
-              >
-                {loading ? 'Chargement...' : 'Gérer mon abonnement'}
-              </button>
-            ) : (
-              <div className="space-y-3 mt-6">
+          {/* Pricing Card */}
+          <div className="card-white border-4 border-blue-600 relative overflow-hidden">
+            <div className="absolute top-0 right-0 bg-blue-600 text-white px-8 py-2 font-black transform rotate-45 translate-x-8 translate-y-4">
+              POPULAIRE
+            </div>
+            
+            <h2 className="text-3xl font-black mb-2" style={{ color: '#1d4ed8' }}>🔹 Plan Basique</h2>
+            <p className="text-gray-500 font-bold mb-8 text-lg">Tout ce dont vous avez besoin pour copier Sadek</p>
+            
+            <div className="mb-8 flex items-baseline gap-2">
+              <span className="text-6xl font-black text-gray-900">29,99€</span>
+              <span className="text-2xl font-bold text-gray-400">/ mois</span>
+            </div>
+
+            <ul className="space-y-4 mb-10">
+              {[
+                "1 compte de trading connecté",
+                "1 canal Telegram de signaux",
+                "5 actifs (GOLD, BTC, SOL...)",
+                "Exécution instantanée",
+                "Support prioritaire"
+              ].map((feature, i) => (
+                <li key={i} className="flex items-center gap-3 font-bold text-gray-700">
+                  <span className="text-green-500 text-xl font-black">✓</span>
+                  {feature}
+                </li>
+              ))}
+            </ul>
+
+            {!isActive && (
+              <div className="space-y-4">
                 <button
                   onClick={() => handleSubscribe('monthly')}
                   disabled={loading}
-                  className="btn btn-primary w-full"
+                  className="btn btn-primary w-full py-4 text-xl shadow-xl transform hover:scale-105 transition-all"
                 >
-                  {loading ? 'Chargement...' : "S'abonner - Mensuel"}
+                  {loading ? '⏳ Connexion Stripe...' : "S'abonner maintenant"}
                 </button>
                 <button
                   onClick={() => handleSubscribe('yearly')}
                   disabled={loading}
-                  className="btn w-full bg-green-500 hover:bg-green-600 text-white"
+                  className="w-full text-blue-600 font-black hover:underline py-2"
                 >
-                  {loading ? 'Chargement...' : "S'abonner - Annuel (Meilleure offre)"}
+                  {loading ? '' : "Préférer le plan annuel (275,88€/an) 💎"}
                 </button>
               </div>
             )}
           </div>
-
-          <div className="card">
-            <h2 className="text-xl font-bold mb-4">🔹 Plan Basique</h2>
-            
-            <div className="mb-4">
-              <p className="text-3xl font-bold">
-                {subscription?.stripe_subscription_id ? (
-                  subscription.current_period_end && 
-                  new Date(subscription.current_period_end) > new Date() ? (
-                    '22,99€' // Si abonnement annuel actif
-                  ) : '29,99€'
-                ) : '29,99€'}
-                <span className="text-lg text-gray-600">/mois</span>
-              </p>
-            </div>
-
-            <ul className="space-y-3 text-gray-700">
-              <li>✓ 1 compte connecté</li>
-              <li>✓ 1 canal connecté</li>
-              <li>✓ 5 actifs tradables</li>
-              <li>✓ 10 positions simultanées maximum</li>
-              <li>✓ Exécution instantanée des trades</li>
-              <li>✓ Dashboard en temps réel</li>
-              <li>✓ Historique complet des trades</li>
-            </ul>
-          </div>
         </div>
 
         {!isActive && (
-          <div className="card mt-6 bg-yellow-50 border border-yellow-200">
-            <h3 className="font-bold text-yellow-800 mb-2">⚠️ Abonnement requis</h3>
-            <p className="text-yellow-700">
-              Vous devez avoir un abonnement actif pour que vos comptes MT5 reçoivent les signaux de trading.
-              Sans abonnement actif, aucune position ne sera copiée.
-            </p>
+          <div className="mt-12 max-w-2xl mx-auto">
+            <div className="bg-red-50 border-l-8 border-red-500 p-6 rounded-r-2xl shadow-lg">
+              <div className="flex items-center gap-4 mb-2">
+                <span className="text-3xl">⚠️</span>
+                <h3 className="text-xl font-black text-red-800 uppercase">Abonnement requis</h3>
+              </div>
+              <p className="text-red-700 font-bold leading-relaxed">
+                Votre compte n'est pas encore activé. Sans abonnement, les signaux Telegram ne seront pas copiés sur votre compte MT5.
+              </p>
+            </div>
           </div>
         )}
       </div>
