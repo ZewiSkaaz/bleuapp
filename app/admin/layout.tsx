@@ -10,7 +10,8 @@ import {
   Database,
   LayoutDashboard,
   Settings,
-  HelpCircle,
+  BookOpen,
+  LogOut,
   Menu,
   X
 } from 'lucide-react';
@@ -27,6 +28,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { name: 'Comptes Master (MT5)', href: '/admin/mt5-accounts', icon: Database },
     { name: 'Logs & Terminal', href: '/admin/logs', icon: Terminal },
     { name: 'Paramètres', href: '/admin/copy-trading', icon: Settings },
+    { name: 'Aide & Onboarding', href: '/admin/aide', icon: BookOpen },
   ];
 
   return (
@@ -74,7 +76,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
           `}>
             {navItems.map((item) => {
-              const isActive = pathname === item.href;
+              const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
               const Icon = item.icon;
               return (
                 <Link 
@@ -101,7 +103,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               href="/dashboard"
               className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 font-medium text-sm hover:bg-white/5 hover:text-white transition-all"
             >
-              <HelpCircle size={18} />
+              <LogOut size={18} />
               Quitter l'Admin
             </Link>
           </aside>
