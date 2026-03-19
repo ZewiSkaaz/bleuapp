@@ -55,6 +55,7 @@ export default function MT5AccountsPage() {
   const [positions, setPositions] = useState<Position[]>([]);
   const [loadingPositions, setLoadingPositions] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
+  const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [loadingServers, setLoadingServers] = useState(false);
   const [loadingSubmit, setLoadingSubmit] = useState(false);
@@ -112,6 +113,15 @@ export default function MT5AccountsPage() {
         router.push("/auth/login");
         return;
       }
+
+      // Fetch profile for admin status
+      const { data: profileData } = await supabase
+        .from("profiles")
+        .select("is_admin")
+        .eq("id", session.user.id)
+        .single();
+      
+      setProfile(profileData);
 
       const { data: accountsData } = await supabase
         .from("mt5_accounts")
@@ -306,7 +316,7 @@ export default function MT5AccountsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar />
+      <Navbar isAdmin={profile?.is_admin} />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex justify-between items-center mb-8">

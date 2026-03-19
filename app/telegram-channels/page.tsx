@@ -23,6 +23,7 @@ type UserSubscription = {
 export default function TelegramChannelsPage() {
   const [channels, setChannels] = useState<TelegramChannel[]>([])
   const [userSubscriptions, setUserSubscriptions] = useState<UserSubscription[]>([])
+  const [profile, setProfile] = useState<any>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const supabase = createClient()
@@ -41,6 +42,15 @@ export default function TelegramChannelsPage() {
       router.push('/auth/login')
       return
     }
+
+    // Fetch profile for admin status
+    const { data: profileData } = await supabase
+      .from('profiles')
+      .select('is_admin')
+      .eq('id', session.user.id)
+      .single()
+    
+    setProfile(profileData)
 
     // Récupérer uniquement les canaux avec un token actif
     const { data: channelsData } = await supabase
@@ -110,7 +120,7 @@ export default function TelegramChannelsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar />
+      <Navbar isAdmin={profile?.is_admin} />
       
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">

@@ -92,6 +92,7 @@ function LotInput({ label, emoji, field, settings, onChange }: LotInputProps) {
 
 export default function SettingsPage() {
   const [settings, setSettings] = useState<TradingSettings>(DEFAULT_SETTINGS)
+  const [profile, setProfile] = useState<any>(null)
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState('')
   const [error, setError] = useState('')
@@ -112,6 +113,15 @@ export default function SettingsPage() {
       router.push('/auth/login')
       return
     }
+
+    // Fetch profile for admin status
+    const { data: profileData } = await supabase
+      .from('profiles')
+      .select('is_admin')
+      .eq('id', session.user.id)
+      .single()
+    
+    setProfile(profileData)
 
     const { data } = await supabase
       .from('trading_settings')
@@ -220,7 +230,7 @@ export default function SettingsPage() {
 
   return (
     <div className="min-h-screen pattern-bg">
-      <Navbar />
+      <Navbar isAdmin={profile?.is_admin} />
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
