@@ -56,7 +56,52 @@ body {
     background-image: 
       radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
       radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
-      radial-gradient(circle at 40% 20%, rgba(255, 255, 255, 0.08) 0%, transparent 50%);
+    radial-gradient(circle at 40% 20%, rgba(255, 255, 255, 0.08) 0%, transparent 50%);
+  }
+
+  /* Admin Dashboard Styles (La Centrale inspired) */
+  .admin-page {
+    @apply min-h-screen bg-[#0f172a] text-slate-200;
+  }
+  
+  .glass-panel {
+    @apply bg-[#1e293b]/80 backdrop-blur-md border border-white/10 shadow-xl rounded-2xl;
+  }
+  
+  .admin-table {
+    @apply w-full text-left border-collapse;
+  }
+  
+  .admin-table th {
+    @apply px-4 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider border-b border-white/10;
+  }
+  
+  .admin-table td {
+    @apply px-4 py-4 text-sm text-slate-300 border-b border-white/5;
+  }
+  
+  .badge-member {
+    @apply px-3 py-1.5 rounded-full text-xs font-bold tracking-wide uppercase;
+  }
+  
+  .badge-member.active {
+    @apply bg-emerald-500/10 text-emerald-400 border border-emerald-500/20;
+  }
+  
+  .badge-member.expired {
+    @apply bg-rose-500/10 text-rose-400 border border-rose-500/20;
+  }
+  
+  .badge-member.suspended {
+    @apply bg-amber-500/10 text-amber-400 border border-amber-500/20;
+  }
+  
+  .source-card {
+    @apply flex flex-col md:flex-row justify-between md:items-center gap-4 p-5 mb-4 glass-panel transition-all;
+  }
+  
+  .source-card.active-source {
+    @apply border-emerald-500/50 bg-emerald-900/20 shadow-[0_0_15px_rgba(16,185,129,0.1)];
   }
 }
 

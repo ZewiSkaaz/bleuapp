@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
-import Navbar from '@/components/Navbar'
+import { Play, Square, Activity, Target, Shield, Clock } from 'lucide-react'
 
 type CopyTrade = {
   id: string
@@ -37,7 +37,7 @@ export default function CopyTradingControlPage() {
     checkServiceStatus()
     fetchRecentTrades()
     
-    // Rafraîchir toutes les 10 secondes
+    // Auto-refresh every 10s
     const interval = setInterval(() => {
       fetchRecentTrades()
     }, 10000)
@@ -46,24 +46,11 @@ export default function CopyTradingControlPage() {
   }, [])
 
   const checkAdmin = async () => {
-    const {
-      data: { session },
-    } = await supabase.auth.getSession()
+    const { data: { session } } = await supabase.auth.getSession()
+    if (!session) { router.push('/auth/login'); return }
 
-    if (!session) {
-      router.push('/auth/login')
-      return
-    }
-
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('is_admin')
-      .eq('id', session.user.id)
-      .single()
-
-    if (!profile?.is_admin) {
-      router.push('/dashboard')
-    }
+    const { data: profile } = await supabase.from('profiles').select('is_admin').eq('id', session.user.id).single()
+    if (!profile?.is_admin) { router.push('/dashboard') }
   }
 
   const checkServiceStatus = async () => {
@@ -79,17 +66,13 @@ export default function CopyTradingControlPage() {
   const fetchRecentTrades = async () => {
     const { data } = await supabase
       .from('copy_trades')
-      .select(`
-        *,
-        profiles!copy_trades_follower_user_id_fkey(full_name)
-      `)
+      .select(`*, profiles!copy_trades_follower_user_id_fkey(full_name)`)
       .order('created_at', { ascending: false })
       .limit(50)
 
     if (data) {
       setRecentTrades(data as any)
 
-      // Calculer les stats
       const total = data.length
       const successful = data.filter((t) => t.status === 'opened' || t.status === 'closed').length
       const active = data.filter((t) => t.status === 'opened').length
@@ -105,14 +88,11 @@ export default function CopyTradingControlPage() {
   const startService = async () => {
     setLoading(true)
     try {
-      const response = await fetch('/api/start-copy-trading-v2', {
-        method: 'POST',
-      })
+      const response = await fetch('/api/start-copy-trading-v2', { method: 'POST' })
       const data = await response.json()
 
       if (data.success) {
         setIsRunning(true)
-        alert('✅ Copy trading démarré!')
       } else {
         alert('❌ Erreur: ' + data.error)
       }
@@ -126,14 +106,11 @@ export default function CopyTradingControlPage() {
   const stopService = async () => {
     setLoading(true)
     try {
-      const response = await fetch('/api/start-copy-trading-v2', {
-        method: 'DELETE',
-      })
+      const response = await fetch('/api/start-copy-trading-v2', { method: 'DELETE' })
       const data = await response.json()
 
       if (data.success) {
         setIsRunning(false)
-        alert('⏸️ Copy trading arrêté')
       }
     } catch (error) {
       alert('❌ Erreur lors de l\'arrêt')
@@ -143,211 +120,135 @@ export default function CopyTradingControlPage() {
   }
 
   return (
-    <div className="min-h-screen pattern-bg">
-      <Navbar />
+    <div className="animate-fade-in space-y-8">
+      <div className="section-header-block mb-8">
+        <h2 className="text-3xl font-bold text-white mb-2">Copy Trading Control</h2>
+        <p className="text-slate-400">Gérez le service de copie automatique globale des trades vers vos clients.</p>
+      </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8">
-          <h1 className="text-4xl font-black text-white mb-2">
-            Copy Trading Control 🎛️
-          </h1>
-          <p className="text-white text-opacity-90 text-lg font-semibold">
-            Gérez le service de copie automatique des trades
-          </p>
-        </div>
-
-        {/* Status du service */}
-        <div className="card-white mb-8">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-2xl font-black mb-2" style={{ color: '#9b30a8' }}>
-                Statut du Service
-              </h2>
-              <div className="flex items-center gap-3">
-                <span
-                  className={`w-4 h-4 rounded-full ${
-                    isRunning ? 'bg-green-500 animate-pulse' : 'bg-red-500'
-                  }`}
-                ></span>
-                <span className="text-xl font-bold" style={{ color: '#9b30a8' }}>
-                  {isRunning ? '🟢 En cours d\'exécution' : '🔴 Arrêté'}
-                </span>
-              </div>
+      {/* Main Control Switch */}
+      <div className="glass-panel p-8 flex flex-col md:flex-row items-center justify-between gap-6 border-l-4 border-l-blue-500">
+        <div className="flex items-center gap-6">
+          <div className="relative">
+            <div className={`w-16 h-16 rounded-full flex items-center justify-center ${isRunning ? 'bg-emerald-500/20 text-emerald-400' : 'bg-slate-800 text-slate-500'}`}>
+              <Activity size={32} className={isRunning ? 'animate-pulse' : ''} />
             </div>
-
-            {isRunning ? (
-              <button
-                onClick={stopService}
-                disabled={loading}
-                className="px-8 py-4 rounded-2xl font-black text-lg bg-red-500 text-white hover:bg-red-600 transition-all shadow-lg hover:scale-105"
-              >
-                {loading ? '⏳ Arrêt...' : '⏸️ Arrêter'}
-              </button>
-            ) : (
-              <button
-                onClick={startService}
-                disabled={loading}
-                className="px-8 py-4 rounded-2xl font-black text-lg bg-green-500 text-white hover:bg-green-600 transition-all shadow-lg hover:scale-105"
-              >
-                {loading ? '⏳ Démarrage...' : '▶️ Démarrer'}
-              </button>
-            )}
+            {isRunning && <span className="absolute top-0 right-0 w-4 h-4 bg-emerald-500 rounded-full border-2 border-[#1e293b]"></span>}
+          </div>
+          <div>
+            <h2 className="text-2xl font-bold text-white mb-1">Moteur Broker</h2>
+            <div className="flex items-center gap-2">
+              <span className={`px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${isRunning ? 'bg-emerald-500/20 text-emerald-400' : 'bg-rose-500/20 text-rose-400'}`}>
+                {isRunning ? '🔴 En Ligne (Actif)' : '⏸️ Suspendu'}
+              </span>
+            </div>
           </div>
         </div>
 
-        {/* Statistiques */}
-        <div className="grid md:grid-cols-3 gap-6 mb-8">
-          <div className="card-white text-center">
-            <h3 className="text-sm font-bold uppercase tracking-wide mb-3" style={{ color: '#9b30a8' }}>
-              Trades Copiés
-            </h3>
-            <p className="text-5xl font-black" style={{ color: '#9b30a8' }}>
-              {stats.totalCopied}
-            </p>
-          </div>
-
-          <div className="card-white text-center">
-            <h3 className="text-sm font-bold uppercase tracking-wide mb-3" style={{ color: '#9b30a8' }}>
-              Taux de Succès
-            </h3>
-            <p className="text-5xl font-black" style={{ color: '#9b30a8' }}>
-              {stats.successRate}%
-            </p>
-          </div>
-
-          <div className="card-white text-center">
-            <h3 className="text-sm font-bold uppercase tracking-wide mb-3" style={{ color: '#9b30a8' }}>
-              Positions Actives
-            </h3>
-            <p className="text-5xl font-black" style={{ color: '#9b30a8' }}>
-              {stats.activePositions}
-            </p>
-          </div>
-        </div>
-
-        {/* Trades récents */}
-        <div className="card-white">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-black" style={{ color: '#9b30a8' }}>
-              Trades Récents
-            </h2>
+        <div className="w-full md:w-auto">
+          {isRunning ? (
             <button
-              onClick={fetchRecentTrades}
-              className="px-4 py-2 rounded-xl font-bold bg-blue-500 text-white hover:bg-blue-600 transition-all"
+              onClick={stopService}
+              disabled={loading}
+              className="w-full md:w-auto flex items-center justify-center gap-2 px-8 py-4 rounded-xl font-bold text-lg bg-rose-600/20 hover:bg-rose-600/40 text-rose-500 border border-rose-500/30 transition-all shadow-[0_0_20px_rgba(225,29,72,0.2)] disabled:opacity-50"
             >
-              🔄 Rafraîchir
+              {loading ? 'Arrêt...' : <><Square size={20} /> Arrêter le relais</>}
             </button>
-          </div>
+          ) : (
+            <button
+              onClick={startService}
+              disabled={loading}
+              className="w-full md:w-auto flex items-center justify-center gap-2 px-8 py-4 rounded-xl font-bold text-lg bg-emerald-600 hover:bg-emerald-500 text-white transition-all shadow-[0_0_20px_rgba(16,185,129,0.3)] disabled:opacity-50"
+            >
+              {loading ? 'Démarrage...' : <><Play size={20} /> Lancer le copie automatique</>}
+            </button>
+          )}
+        </div>
+      </div>
 
-          {recentTrades.length > 0 ? (
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b-2 border-primary-200">
-                    <th className="text-left py-3 px-4 font-black" style={{ color: '#9b30a8' }}>
-                      Utilisateur
-                    </th>
-                    <th className="text-left py-3 px-4 font-black" style={{ color: '#9b30a8' }}>
-                      Symbole
-                    </th>
-                    <th className="text-left py-3 px-4 font-black" style={{ color: '#9b30a8' }}>
-                      Type
-                    </th>
-                    <th className="text-left py-3 px-4 font-black" style={{ color: '#9b30a8' }}>
-                      Volume
-                    </th>
-                    <th className="text-left py-3 px-4 font-black" style={{ color: '#9b30a8' }}>
-                      Statut
-                    </th>
-                    <th className="text-left py-3 px-4 font-black" style={{ color: '#9b30a8' }}>
-                      Date
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {recentTrades.map((trade) => (
-                    <tr key={trade.id} className="border-b border-primary-100 hover:bg-primary-50 transition-all">
-                      <td className="py-3 px-4 font-semibold" style={{ color: '#9b30a8' }}>
-                        {trade.profiles?.full_name || 'N/A'}
+      {/* Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="glass-panel p-6 flex flex-col items-center justify-center text-center">
+          <Target size={24} className="text-indigo-400 mb-3" />
+          <p className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-1">Trades Copiés</p>
+          <h3 className="text-4xl font-black text-white">{stats.totalCopied}</h3>
+        </div>
+        <div className="glass-panel p-6 flex flex-col items-center justify-center text-center">
+          <Shield size={24} className="text-emerald-400 mb-3" />
+          <p className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-1">Taux de Succès</p>
+          <h3 className="text-4xl font-black text-white">{stats.successRate}%</h3>
+        </div>
+        <div className="glass-panel p-6 flex flex-col items-center justify-center text-center">
+          <Clock size={24} className="text-blue-400 mb-3" />
+          <p className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-1">Récents Actifs</p>
+          <h3 className="text-4xl font-black text-white">{stats.activePositions}</h3>
+        </div>
+      </div>
+
+      {/* Recent Trades Table */}
+      <div className="glass-panel overflow-hidden">
+        <div className="p-6 border-b border-white/10 flex justify-between items-center bg-[#0f172a]/50">
+          <h3 className="text-xl font-bold text-white">Monitoring des Positions (Live)</h3>
+          <button onClick={fetchRecentTrades} className="text-sm text-blue-400 hover:text-blue-300 font-semibold bg-blue-500/10 px-4 py-2 rounded-lg transition-colors">
+            Rafraîchir
+          </button>
+        </div>
+        
+        <div className="overflow-x-auto">
+          <table className="admin-table">
+            <thead className="bg-[#0f172a]/20">
+              <tr>
+                <th>Utilisateur (Client)</th>
+                <th>Symbole</th>
+                <th>Sens</th>
+                <th>Volume</th>
+                <th>Statut Broker</th>
+                <th className="text-right">Horodatage</th>
+              </tr>
+            </thead>
+            <tbody>
+              {recentTrades.length > 0 ? (
+                recentTrades.map((trade) => {
+                  const isBuy = trade.order_type === 'BUY'
+                  return (
+                    <tr key={trade.id} className="hover:bg-white/5 transition-colors">
+                      <td className="font-semibold text-white">
+                        {trade.profiles?.full_name || 'Inconnu'}
                       </td>
-                      <td className="py-3 px-4 font-bold" style={{ color: '#9b30a8' }}>
-                        {trade.symbol}
-                      </td>
-                      <td className="py-3 px-4">
-                        <span
-                          className={`px-3 py-1 rounded-full text-sm font-bold ${
-                            trade.order_type === 'BUY' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
-                          }`}
-                        >
+                      <td className="font-bold text-indigo-400">{trade.symbol}</td>
+                      <td>
+                        <span className={`px-3 py-1 rounded text-xs font-bold uppercase tracking-wider ${isBuy ? 'bg-emerald-500/20 text-emerald-400' : 'bg-rose-500/20 text-rose-400'}`}>
                           {trade.order_type}
                         </span>
                       </td>
-                      <td className="py-3 px-4 font-semibold" style={{ color: '#9b30a8' }}>
-                        {trade.volume}
-                      </td>
-                      <td className="py-3 px-4">
-                        <span
-                          className={`px-3 py-1 rounded-full text-sm font-bold ${
-                            trade.status === 'opened'
-                              ? 'bg-blue-500 text-white'
-                              : trade.status === 'closed'
-                              ? 'bg-green-500 text-white'
-                              : trade.status === 'failed'
-                              ? 'bg-red-500 text-white'
-                              : 'bg-gray-400 text-white'
-                          }`}
-                        >
+                      <td className="font-mono text-slate-300">{trade.volume || '0.01'}</td>
+                      <td>
+                        <span className={`px-2 py-1 rounded text-xs font-medium uppercase ${
+                          trade.status === 'opened' ? 'bg-blue-500/20 text-blue-400' :
+                          trade.status === 'closed' ? 'bg-emerald-500/20 text-emerald-400' :
+                          trade.status === 'failed' ? 'bg-rose-500/20 text-rose-400' :
+                          'bg-slate-500/20 text-slate-400'
+                        }`}>
                           {trade.status}
                         </span>
                       </td>
-                      <td className="py-3 px-4 text-sm font-semibold" style={{ color: '#9b30a8' }}>
-                        {new Date(trade.opened_at).toLocaleString('fr-FR')}
+                      <td className="text-right text-xs text-slate-400">
+                        {new Date(trade.opened_at).toLocaleTimeString('fr-FR')}
                       </td>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          ) : (
-            <div className="text-center py-12">
-              <p className="text-xl font-bold" style={{ color: '#9b30a8' }}>
-                Aucun trade copié pour le moment
-              </p>
-              <p className="opacity-75 mt-2" style={{ color: '#9b30a8' }}>
-                Les trades apparaîtront ici dès qu'ils seront copiés
-              </p>
-            </div>
-          )}
-        </div>
-
-        {/* Guide */}
-        <div className="card-white mt-8">
-          <h2 className="text-2xl font-black mb-4" style={{ color: '#9b30a8' }}>
-            📘 Comment ça marche?
-          </h2>
-          <div className="space-y-3 opacity-90" style={{ color: '#9b30a8' }}>
-            <p className="font-semibold">
-              <strong>1. Démarrez le service:</strong> Cliquez sur "Démarrer" pour activer le monitoring
-            </p>
-            <p className="font-semibold">
-              <strong>2. Le service monitore:</strong> Toutes les 5 secondes, il vérifie les positions
-              des comptes admin
-            </p>
-            <p className="font-semibold">
-              <strong>3. Copie automatique:</strong> Dès qu'une position est détectée, elle est
-              copiée sur tous les comptes utilisateurs actifs
-            </p>
-            <p className="font-semibold">
-              <strong>4. Adaptation:</strong> Les lots sont adaptés selon les settings de chaque
-              utilisateur (GOLD, SOL, BTC)
-            </p>
-            <p className="font-semibold">
-              <strong>5. Mapping:</strong> Les symboles sont automatiquement mappés selon le broker
-            </p>
-          </div>
+                  )
+                })
+              ) : (
+                <tr>
+                  <td colSpan={6} className="py-12 text-center text-slate-500">
+                    Aucun trade intercepté récemment.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
   )
 }
-

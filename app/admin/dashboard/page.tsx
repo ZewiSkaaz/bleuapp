@@ -1,18 +1,13 @@
 import { createServerClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import Navbar from '@/components/Navbar'
+import { Users, Zap, TrendingUp, ShieldCheck } from 'lucide-react'
 import Link from 'next/link'
 
 export default async function AdminDashboardPage() {
   const supabase = createServerClient()
+  const { data: { session } } = await supabase.auth.getSession()
 
-  const {
-    data: { session },
-  } = await supabase.auth.getSession()
-
-  if (!session) {
-    redirect('/auth/login')
-  }
+  if (!session) redirect('/auth/login')
 
   const { data: profile } = await supabase
     .from('profiles')
@@ -20,88 +15,82 @@ export default async function AdminDashboardPage() {
     .eq('id', session.user.id)
     .single()
 
-  if (!profile?.is_admin) {
-    redirect('/dashboard')
-  }
+  if (!profile?.is_admin) redirect('/dashboard')
 
-  const { data: adminMt5Account } = await supabase
-    .from('mt5_accounts')
-    .select('id, account_number, broker_name, server_name, is_active')
-    .eq('user_id', session.user.id)
-    .eq('is_active', true)
-    .single()
+  // Fetch some stats for the dashboard
+  const { count: usersCount } = await supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('is_admin', false)
+  const { count: activeSubs } = await supabase.from('subscriptions').select('*', { count: 'exact', head: true }).eq('status', 'active')
+  const { count: signalsCount } = await supabase.from('telegram_signals').select('*', { count: 'exact', head: true })
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Navbar isAdmin={true} />
+    <div className="animate-fade-in space-y-8">
       
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="mb-12 text-center">
-          <h1 className="text-4xl font-extrabold text-primary-900 mb-4">Dashboard Admin BleuApp</h1>
-          <p className="text-lg text-gray-600">Gérez votre application simplement, en quelques clics.</p>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* Stat Cards */}
+        <div className="glass-panel p-6 flex flex-col items-center justify-center text-center">
+          <div className="w-12 h-12 rounded-full bg-blue-500/20 flex items-center justify-center mb-4 text-blue-400">
+            <Users size={24} />
+          </div>
+          <h3 className="text-3xl font-bold text-white mb-1">{usersCount || 0}</h3>
+          <p className="text-sm font-medium text-slate-400">Total Clients</p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-8 mb-8">
-          {/* Action 1: Gérer les Clients */}
-          <div className="card-white flex flex-col justify-between hover:shadow-2xl transition-shadow border-t-4 border-primary-500">
-            <div>
-              <div className="text-4xl mb-4">👥</div>
-              <h2 className="text-2xl font-bold mb-2 text-primary-800">Gérer les Clients</h2>
-              <p className="text-gray-600 mb-6">
-                Voir tous les utilisateurs, activer ou désactiver manuellement leurs accès sans passer par Stripe.
-              </p>
-            </div>
-            <Link href="/admin/users" className="btn btn-primary w-full text-center">
-              Ouvrir la gestion des clients
-            </Link>
+        <div className="glass-panel p-6 flex flex-col items-center justify-center text-center">
+          <div className="w-12 h-12 rounded-full bg-emerald-500/20 flex items-center justify-center mb-4 text-emerald-400">
+            <ShieldCheck size={24} />
           </div>
-
-          {/* Action 2: Contrôler le Bot */}
-          <div className="card-white flex flex-col justify-between hover:shadow-2xl transition-shadow border-t-4 border-primary-500">
-            <div>
-              <div className="text-4xl mb-4">🤖</div>
-              <h2 className="text-2xl font-bold mb-2 text-primary-800">Canaux Telegram</h2>
-              <p className="text-gray-600 mb-6">
-                Ajouter ou supprimer les sources Telegram pour les signaux (ex: signaux vision, signaux vip).
-              </p>
-            </div>
-            <Link href="/admin/telegram-channels" className="btn btn-primary w-full text-center">
-              Gérer les canaux Telegram
-            </Link>
-          </div>
-
-          {/* Action 3: Compte Master */}
-          <div className="card-white flex flex-col justify-between hover:shadow-2xl transition-shadow border-t-4 border-primary-500 md:col-span-2">
-            <div className="flex flex-col md:flex-row md:items-center justify-between">
-              <div className="mb-6 md:mb-0 md:pr-8">
-                <div className="text-4xl mb-4">🏦</div>
-                <h2 className="text-2xl font-bold mb-2 text-primary-800">Compte Master (MT5)</h2>
-                <p className="text-gray-600">
-                  C'est depuis ce compte que les trades seront copiés vers vos clients. 
-                </p>
-                {adminMt5Account ? (
-                  <div className="mt-4 p-4 bg-green-50 rounded-lg inline-block border border-green-200">
-                    <p className="font-semibold text-green-800">
-                      ✓ Connecté : {adminMt5Account.broker_name} (#{adminMt5Account.account_number})
-                    </p>
-                  </div>
-                ) : (
-                  <div className="mt-4 p-4 bg-red-50 rounded-lg inline-block border border-red-200">
-                    <p className="font-semibold text-red-800">
-                      ⚠️ Aucun compte Master configuré.
-                    </p>
-                  </div>
-                )}
-              </div>
-              <Link href="/mt5-accounts" className="btn btn-primary whitespace-nowrap">
-                {adminMt5Account ? 'Modifier mon compte' : 'Connecter mon compte'}
-              </Link>
-            </div>
-          </div>
+          <h3 className="text-3xl font-bold text-white mb-1">{activeSubs || 0}</h3>
+          <p className="text-sm font-medium text-slate-400">Abonnés Actifs</p>
         </div>
 
+        <div className="glass-panel p-6 flex flex-col items-center justify-center text-center">
+          <div className="w-12 h-12 rounded-full bg-indigo-500/20 flex items-center justify-center mb-4 text-indigo-400">
+            <Zap size={24} />
+          </div>
+          <h3 className="text-3xl font-bold text-white mb-1">{signalsCount || 0}</h3>
+          <p className="text-sm font-medium text-slate-400">Signaux Reçus</p>
+        </div>
+
+        <div className="glass-panel p-6 flex flex-col items-center justify-center text-center border-emerald-500/30">
+          <div className="w-12 h-12 rounded-full bg-emerald-500/20 flex items-center justify-center mb-4 text-emerald-400">
+            <TrendingUp size={24} />
+          </div>
+          <h3 className="text-lg font-bold text-emerald-400 mb-1">Système Actif</h3>
+          <p className="text-sm font-medium text-slate-400">Tout fonctionne</p>
+        </div>
       </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="glass-panel p-6">
+          <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+            <Users size={20} className="text-blue-400" /> Gestion Rapide
+          </h3>
+          <p className="text-slate-400 mb-6 text-sm">
+            Accédez rapidement à la gestion des utilisateurs pour activer, suspendre ou modifier les comptes sans passer par Stripe.
+          </p>
+          <Link href="/admin/users" className="bg-blue-600 hover:bg-blue-500 text-white font-semibold py-3 px-6 rounded-xl transition-colors w-full inline-block text-center">
+            Ouvrir la gestion des membres
+          </Link>
+        </div>
+
+        <div className="glass-panel p-6">
+          <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+            <Zap size={20} className="text-indigo-400" /> Configuration Signaux
+          </h3>
+          <p className="text-slate-400 mb-6 text-sm">
+            Ajoutez de nouvelles sources Telegram, configurez le trading automatique et consultez l'état de la connexion.
+          </p>
+          <div className="flex gap-4">
+            <Link href="/admin/telegram-channels" className="bg-[#1e293b] hover:bg-slate-700 border border-white/10 text-white font-semibold py-3 px-6 rounded-xl transition-colors flex-1 text-center">
+              Canaux
+            </Link>
+            <Link href="/admin/logs" className="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-3 px-6 rounded-xl transition-colors flex-1 text-center">
+              Voir les Logs
+            </Link>
+          </div>
+        </div>
+      </div>
+      
     </div>
   )
 }
-

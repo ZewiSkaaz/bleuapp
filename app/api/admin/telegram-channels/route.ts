@@ -22,7 +22,7 @@ export async function POST(request: Request) {
     if (!profile?.is_admin) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
     if (action === 'create') {
-      const { chat_id, style, prefix } = body
+      const { name, chat_id, style, prefix, is_premium } = body
       
       if (!chat_id) {
         return NextResponse.json({ error: 'Chat ID required' }, { status: 400 })
@@ -30,7 +30,7 @@ export async function POST(request: Request) {
 
       const { data, error } = await supabase
         .from('telegram_channels')
-        .insert({ chat_id, style, prefix })
+        .insert({ name, chat_id, style, prefix, is_premium })
         .select()
         .single()
 
