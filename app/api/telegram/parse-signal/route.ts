@@ -1,3 +1,4 @@
+import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { normalizeSymbol, mapSymbolToBroker, executeTradesForSignal, triggerTradeExecution } from "@/lib/trading-service";
 
