@@ -49,10 +49,13 @@ export async function POST(request: Request) {
         stripe_customer_id: 'manual_' + Date.now()
       })
       
-      // Update profile name
-      if (full_name) {
-        await adminAuthClient.from('profiles').update({ full_name }).eq('id', data.user.id)
-      }
+      // Upsert profile to guarantee it exists (bypassing potential missing triggers)
+      await adminAuthClient.from('profiles').upsert({ 
+        id: data.user.id,
+        full_name: full_name || 'Sans Nom',
+        email: email,
+        is_admin: false
+      })
     }
 
     return NextResponse.json({ success: true, user: data.user })
