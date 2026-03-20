@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { Terminal as TerminalIcon, RefreshCw, Power, AlertCircle, ShieldCheck } from 'lucide-react'
 
-export default function TerminalClient({ initialSignals, recentUsers }: { initialSignals: any[], recentUsers: any[] }) {
+export default function SystemTerminalClient({ recentUsers }: { recentUsers: any[] }) {
   const [logs, setLogs] = useState<{type: string, msg: string, time: string}[]>([])
   const [isSyncing, setIsSyncing] = useState(false)
   const bottomRef = useRef<HTMLDivElement>(null)
@@ -15,7 +15,7 @@ export default function TerminalClient({ initialSignals, recentUsers }: { initia
     // Add system boot msg
     startingLogs.push({ type: 'accent', msg: 'System initialized. Connecting to BleuApp central database...', time: new Date(Date.now() - 60000).toLocaleTimeString() })
     startingLogs.push({ type: 'success', msg: 'Connected to Supabase [Production]', time: new Date(Date.now() - 59000).toLocaleTimeString() })
-    startingLogs.push({ type: 'white', msg: `Loaded ${initialSignals.length} recent signals from history.`, time: new Date(Date.now() - 58000).toLocaleTimeString() })
+
 
     // Add recent users
     recentUsers.forEach((u, i) => {
@@ -26,18 +26,9 @@ export default function TerminalClient({ initialSignals, recentUsers }: { initia
       })
     })
 
-    // Add recent signals
-    initialSignals.slice(0, 10).forEach(sig => {
-      startingLogs.push({ 
-        type: 'success', 
-        msg: `[SIGNAL_IN] ${sig.action} ${sig.symbol} | SL: ${sig.sl || '-'} | TP: ${sig.tp || '-'}`, 
-        time: new Date(sig.created_at).toLocaleTimeString() 
-      })
-    })
-
     // Sort by time roughly
     setLogs(startingLogs.reverse())
-  }, [initialSignals, recentUsers])
+  }, [recentUsers])
 
   useEffect(() => {
     // Auto scroll
@@ -68,7 +59,7 @@ export default function TerminalClient({ initialSignals, recentUsers }: { initia
       <div className="flex items-center justify-between p-4 border-b border-white/10 bg-[#0f172a]/50">
         <div className="flex items-center gap-2">
           <TerminalIcon size={18} className="text-blue-400" />
-          <h3 className="text-white font-mono text-sm">root@bleuapp:~</h3>
+          <h3 className="text-white font-mono text-sm">root@system:~</h3>
         </div>
 
         <div className="flex items-center gap-3">

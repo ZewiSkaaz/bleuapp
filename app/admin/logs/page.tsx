@@ -1,7 +1,8 @@
 import { createServerClient } from '@/lib/supabase/server'
 import { createClient } from '@supabase/supabase-js'
 import { redirect } from 'next/navigation'
-import TerminalClient from './TerminalClient'
+import SystemTerminalClient from './SystemTerminalClient'
+import TelegramTerminalClient from './TelegramTerminalClient'
 
 export const revalidate = 0
 
@@ -42,12 +43,20 @@ export default async function AdminLogsPage() {
   return (
     <div className="animate-fade-in h-[calc(100vh-120px)] flex flex-col">
       <div className="section-header-block mb-4 shrink-0">
-        <h2 className="text-3xl font-bold text-white mb-2">Logs & Terminal</h2>
-        <p className="text-slate-400">Supervisez l'activité en temps réel du bot et relancez les systèmes en cas de bug.</p>
+        <h2 className="text-3xl font-bold text-white mb-2">Logs & Terminaux</h2>
+        <p className="text-slate-400">Supervisez l'activité système et le relais Telegram en direct.</p>
       </div>
 
-      <div className="flex-1 min-h-0 bg-[#0f172a] rounded-2xl border border-white/10 shadow-2xl flex flex-col overflow-hidden">
-        <TerminalClient initialSignals={signals || []} recentUsers={newUsers || []} />
+      <div className="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {/* Terminal Système */}
+        <div className="bg-[#0f172a] rounded-2xl border border-white/10 shadow-2xl flex flex-col overflow-hidden">
+          <SystemTerminalClient recentUsers={newUsers || []} />
+        </div>
+        
+        {/* Terminal Telegram */}
+        <div className="bg-[#0f172a] rounded-2xl border border-white/10 shadow-2xl flex flex-col overflow-hidden">
+          <TelegramTerminalClient initialSignals={signals || []} />
+        </div>
       </div>
     </div>
   )
