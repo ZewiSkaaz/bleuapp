@@ -25,7 +25,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { name: 'Control Center', href: '/admin/dashboard', icon: LayoutDashboard },
     { name: 'Membres & Accès', href: '/admin/users', icon: Users },
     { name: 'Canaux Telegram', href: '/admin/telegram-channels', icon: Zap },
-    { name: 'Comptes Master (MT5)', href: '/admin/mt5-accounts', icon: Database },
+    { name: 'Comptes MT5 Clients', href: '/admin/mt5-accounts', icon: Database },
     { name: 'Logs & Terminal', href: '/admin/logs', icon: Terminal },
     { name: 'Paramètres', href: '/admin/copy-trading', icon: Settings },
     { name: 'Aide & Onboarding', href: '/admin/aide', icon: BookOpen },

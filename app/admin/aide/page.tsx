@@ -43,13 +43,13 @@ const guides = [
   },
   {
     id: 'trading',
-    title: 'Copy Trading & MT5',
-    description: 'Liez vos comptes MetaTrader 5, activez la réplication automatique des trades vers vos clients.',
+    title: 'Comptes MT5 Clients',
+    description: 'Gérez les comptes MetaTrader 5 de vos clients où les trades issus des signaux Telegram sont exécutés automatiquement.',
     icon: Database,
     color: 'from-amber-500 to-orange-600',
     bgColor: 'bg-amber-500/10',
     iconColor: 'text-amber-400',
-    steps: ['Connecter un compte Master', 'Activer MetaAPI', 'Gérer les followers', 'Surveiller les positions'],
+    steps: ['Connecter un compte client', 'Configurer MetaAPI', 'Vue admin des comptes', 'Surveillance des positions'],
     href: '/admin/aide/trading'
   },
   {
