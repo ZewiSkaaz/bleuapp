@@ -1,4 +1,5 @@
 import { createServerClient } from '@/lib/supabase/server'
+import { createClient } from '@supabase/supabase-js'
 import { redirect } from 'next/navigation'
 import UsersTableClient from './UsersTableClient'
 
@@ -13,10 +14,15 @@ export default async function AdminUsersPage() {
     .select('*')
     .eq('id', session.user.id)
     .single()
-
   if (!profile?.is_admin) redirect('/dashboard')
 
-  const { data: users } = await supabase
+  // Use service role to bypass RLS for reading all profiles
+  const adminClient = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
+
+  const { data: users } = await adminClient
     .from('profiles')
     .select(`
       *,

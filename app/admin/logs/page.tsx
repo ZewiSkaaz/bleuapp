@@ -1,4 +1,5 @@
 import { createServerClient } from '@/lib/supabase/server'
+import { createClient } from '@supabase/supabase-js'
 import { redirect } from 'next/navigation'
 import TerminalClient from './TerminalClient'
 
@@ -25,8 +26,14 @@ export default async function AdminLogsPage() {
     .order('created_at', { ascending: false })
     .limit(20)
 
+  // Use adminClient to bypass RLS for fetching all users
+  const adminClient = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
+
   // Fetch recent profiles to show member activity
-  const { data: newUsers } = await supabase
+  const { data: newUsers } = await adminClient
     .from('profiles')
     .select('id, full_name, email, created_at')
     .order('created_at', { ascending: false })

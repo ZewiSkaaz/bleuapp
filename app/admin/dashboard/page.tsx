@@ -1,4 +1,5 @@
 import { createServerClient } from '@/lib/supabase/server'
+import { createClient } from '@supabase/supabase-js'
 import { redirect } from 'next/navigation'
 import { Users, Zap, TrendingUp, ShieldCheck } from 'lucide-react'
 import Link from 'next/link'
@@ -18,7 +19,12 @@ export default async function AdminDashboardPage() {
   if (!profile?.is_admin) redirect('/dashboard')
 
   // Fetch some stats for the dashboard
-  const { count: usersCount } = await supabase.from('profiles').select('*', { count: 'exact', head: true }).or('is_admin.eq.false,is_admin.is.null')
+  const adminClient = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
+
+  const { count: usersCount } = await adminClient.from('profiles').select('*', { count: 'exact', head: true }).or('is_admin.eq.false,is_admin.is.null')
   const { count: activeSubs } = await supabase.from('subscriptions').select('*', { count: 'exact', head: true }).eq('status', 'active')
   const { count: signalsCount } = await supabase.from('telegram_signals').select('*', { count: 'exact', head: true })
 
