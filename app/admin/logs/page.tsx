@@ -40,6 +40,12 @@ export default async function AdminLogsPage() {
     .order('created_at', { ascending: false })
     .limit(5)
 
+  // Fetch telegram channels for the manual signal dropdown
+  const { data: channels } = await adminClient
+    .from('telegram_channels')
+    .select('id, name, username')
+    .eq('is_active', true)
+
   return (
     <div className="animate-fade-in h-[calc(100vh-120px)] flex flex-col">
       <div className="section-header-block mb-4 shrink-0">
@@ -55,7 +61,10 @@ export default async function AdminLogsPage() {
         
         {/* Terminal Telegram */}
         <div className="bg-[#0f172a] rounded-2xl border border-white/10 shadow-2xl flex flex-col overflow-hidden">
-          <TelegramTerminalClient initialSignals={signals || []} />
+          <TelegramTerminalClient 
+            initialSignals={signals || []} 
+            initialChannels={channels || []} 
+          />
         </div>
       </div>
     </div>
