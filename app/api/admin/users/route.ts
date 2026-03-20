@@ -50,12 +50,13 @@ export async function POST(request: Request) {
       })
       
       // Upsert profile to guarantee it exists (bypassing potential missing triggers)
-      await adminAuthClient.from('profiles').upsert({ 
+      const { error: upsertError } = await adminAuthClient.from('profiles').upsert({ 
         id: data.user.id,
         full_name: full_name || 'Sans Nom',
         email: email,
         is_admin: false
       })
+      if (upsertError) throw upsertError
     }
 
     return NextResponse.json({ success: true, user: data.user })
