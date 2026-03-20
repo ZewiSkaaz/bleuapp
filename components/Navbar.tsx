@@ -1,12 +1,17 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
 
 export default function Navbar({ isAdmin = false }: { isAdmin?: boolean }) {
   const router = useRouter()
+  const pathname = usePathname()
   const supabase = createClient()
+
+  // On admin pages → show admin nav. On client pages → show client nav.
+  const isOnAdminPage = pathname.startsWith('/admin')
+  const showAdminNav = isAdmin && isOnAdminPage
 
   const handleLogout = async () => {
     await supabase.auth.signOut()
@@ -24,7 +29,7 @@ export default function Navbar({ isAdmin = false }: { isAdmin?: boolean }) {
           </div>
           
           <div className="flex items-center space-x-2 sm:space-x-4">
-            {isAdmin ? (
+            {showAdminNav ? (
               <>
                 <Link href="/admin/dashboard" className="text-white hover:text-white hover:opacity-80 font-bold px-3 py-2 rounded-lg transition-all border border-white/20 bg-white/10">
                   Administration
@@ -37,6 +42,10 @@ export default function Navbar({ isAdmin = false }: { isAdmin?: boolean }) {
                 </Link>
                 <Link href="/admin/users" className="text-white hover:text-white hover:opacity-80 font-bold px-3 py-2 rounded-lg transition-all hidden lg:block">
                   Users
+                </Link>
+                {/* Switch to client view */}
+                <Link href="/dashboard" className="text-xs font-bold px-3 py-1.5 rounded-full bg-white/20 hover:bg-white/30 text-white transition-all flex items-center gap-1 border border-white/30">
+                  👤 Vue Client
                 </Link>
               </>
             ) : (
@@ -53,6 +62,12 @@ export default function Navbar({ isAdmin = false }: { isAdmin?: boolean }) {
                 <Link href="/subscription" className="text-white hover:text-white hover:opacity-80 font-bold px-3 py-2 rounded-lg transition-all">
                   Abo
                 </Link>
+                {/* Switch back to admin view (only visible if admin) */}
+                {isAdmin && (
+                  <Link href="/admin/dashboard" className="text-xs font-bold px-3 py-1.5 rounded-full bg-white/20 hover:bg-white/30 text-white transition-all flex items-center gap-1 border border-white/30">
+                    🔒 Admin
+                  </Link>
+                )}
               </>
             )}
             <button
