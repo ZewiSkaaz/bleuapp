@@ -31,7 +31,7 @@ const tables = [
 ]
 
 export default function ArchitectureGuidePage() {
-  const categories = [...new Set(envVars.map(v => v.category))]
+  const categories = Array.from(new Set(envVars.map(v => v.category)))
   
   return (
     <div className="animate-fade-in space-y-8">
