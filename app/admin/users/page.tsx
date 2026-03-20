@@ -23,7 +23,7 @@ export default async function AdminUsersPage() {
       subscriptions(*),
       mt5_accounts(count)
     `)
-    .eq('is_admin', false)
+    .or('is_admin.eq.false,is_admin.is.null')
     .order('created_at', { ascending: false })
 
   return (

@@ -18,7 +18,7 @@ export default async function AdminDashboardPage() {
   if (!profile?.is_admin) redirect('/dashboard')
 
   // Fetch some stats for the dashboard
-  const { count: usersCount } = await supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('is_admin', false)
+  const { count: usersCount } = await supabase.from('profiles').select('*', { count: 'exact', head: true }).or('is_admin.eq.false,is_admin.is.null')
   const { count: activeSubs } = await supabase.from('subscriptions').select('*', { count: 'exact', head: true }).eq('status', 'active')
   const { count: signalsCount } = await supabase.from('telegram_signals').select('*', { count: 'exact', head: true })
 
