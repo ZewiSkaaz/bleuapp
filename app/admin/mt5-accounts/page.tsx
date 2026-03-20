@@ -140,7 +140,7 @@ export default function AdminMT5AccountsPage() {
 
       if (dbError) throw dbError
 
-      setSuccess('Compte Master synchronisé avec succès!')
+      setSuccess('Compte MT5 synchronisé avec succès!')
       setFormData({ broker_name: '', server_name: '', account_number: '', password: '' })
       setShowAddForm(false)
       fetchAdminAccounts()
@@ -157,7 +157,7 @@ export default function AdminMT5AccountsPage() {
   }
 
   const deleteAccount = async (accountId: string) => {
-    if (!confirm('Action irréversible. Êtes-vous sûr de vouloir supprimer ce compte Maître?')) return
+    if (!confirm('Action irréversible. Êtes-vous sûr de vouloir supprimer ce compte MT5 ?')) return
     const { error } = await supabase.from('mt5_accounts').delete().eq('id', accountId)
     if (!error) fetchAdminAccounts()
   }
@@ -165,8 +165,8 @@ export default function AdminMT5AccountsPage() {
   return (
     <div className="animate-fade-in space-y-8">
       <div className="section-header-block mb-8">
-        <h2 className="text-3xl font-bold text-white mb-2">Comptes Master MT5</h2>
-        <p className="text-slate-400">Gérez vos comptes de trading maîtres qui diffusent les trades vers les clients.</p>
+        <h2 className="text-3xl font-bold text-white mb-2">Comptes MT5 Clients</h2>
+        <p className="text-slate-400">Supervisez les comptes de trading de vos clients connectés via MetaAPI.</p>
       </div>
 
       {error && (
@@ -184,7 +184,7 @@ export default function AdminMT5AccountsPage() {
       <div className="glass-panel p-6">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
           <h2 className="text-2xl font-bold text-white flex items-center gap-2">
-            <Database size={24} className="text-blue-400" /> Vos Masters Actifs
+            <Database size={24} className="text-blue-400" /> Comptes MT5 Connectés
           </h2>
           <button
             onClick={() => setShowAddForm(!showAddForm)}
@@ -282,10 +282,10 @@ export default function AdminMT5AccountsPage() {
                   <div className="flex items-center gap-3 mb-1">
                     <h3 className="text-xl font-bold text-white">{account.broker_name}</h3>
                     <span className="badge-member bg-blue-500/20 text-blue-400 border border-blue-500/30 px-3 flex items-center gap-1">
-                      <Shield size={12} /> MASTER
+                      <Shield size={12} /> CLIENT
                     </span>
                     <span className={`badge-member px-3 ${account.is_active ? 'active' : 'bg-slate-700 text-slate-400 border-none'}`}>
-                      {account.is_active ? 'BROADCASTING' : 'OFFLINE'}
+                      {account.is_active ? 'ACTIF' : 'OFFLINE'}
                     </span>
                   </div>
                   <div className="flex flex-wrap gap-4 text-sm font-medium text-slate-400">
