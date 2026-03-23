@@ -190,10 +190,14 @@ export default function UsersTableClient({ initialUsers }: { initialUsers: any[]
                         </span>
                       </td>
                       <td>
-                        <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div className="flex justify-end gap-2 transition-opacity">
                           {/* Toggle Sub Access */}
                           <button 
-                            onClick={() => toggleSubscription(user.id, user.subscriptions?.status)}
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleSubscription(user.id, user.subscriptions?.status);
+                            }}
                             disabled={loadingId === user.id}
                             className={`p-2 rounded-lg text-white transition-colors flex items-center gap-1 ${isActive ? 'bg-amber-500/20 hover:bg-amber-500/40 text-amber-400' : 'bg-emerald-500/20 hover:bg-emerald-500/40 text-emerald-400'}`}
                             title={isActive ? "Suspendre l'accès" : "Activer l'accès manuellement"}
