@@ -206,14 +206,31 @@ export default function UsersTableClient({ initialUsers }: { initialUsers: any[]
                           </button>
                           
                           {/* Edit */}
-                          <button onClick={() => openEdit(user)} className="p-2 bg-blue-500/20 hover:bg-blue-500/40 text-blue-400 rounded-lg transition-colors" title="Modifier le client">
-                            <Edit size={16} />
-                          </button>
+                           <button 
+                             type="button"
+                             onClick={(e) => {
+                               e.stopPropagation();
+                               openEdit(user);
+                             }} 
+                             className="p-2 bg-blue-500/20 hover:bg-blue-500/40 text-blue-400 rounded-lg transition-colors" 
+                             title="Modifier le client"
+                           >
+                             <Edit size={16} />
+                           </button>
                           
                           {/* Delete */}
-                          <button onClick={() => handleDeleteUser(user.id)} disabled={loadingId === user.id} className="p-2 bg-rose-500/20 hover:bg-rose-500/40 text-rose-400 rounded-lg transition-colors" title="Supprimer le client">
-                            <Trash2 size={16} />
-                          </button>
+                           <button 
+                             type="button"
+                             onClick={(e) => {
+                               e.stopPropagation();
+                               handleDeleteUser(user.id);
+                             }} 
+                             disabled={loadingId === user.id} 
+                             className="p-2 bg-rose-500/20 hover:bg-rose-500/40 text-rose-400 rounded-lg transition-colors" 
+                             title="Supprimer le client"
+                           >
+                             <Trash2 size={16} />
+                           </button>
                         </div>
                       </td>
                     </tr>
