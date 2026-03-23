@@ -29,14 +29,13 @@ export default async function AdminUsersPage() {
       subscriptions(*),
       mt5_accounts(count)
     `)
-    .or('is_admin.eq.false,is_admin.is.null')
     .order('created_at', { ascending: false })
 
   return (
     <div className="animate-fade-in">
       <div className="mb-8">
-        <h2 className="text-3xl font-bold text-white mb-2">Comptes Clients</h2>
-        <p className="text-slate-400">Ajoutez, modifiez ou supprimez des membres de votre SaaS directement ici.</p>
+        <h2 className="text-3xl font-bold text-white mb-2">Tous les Comptes</h2>
+        <p className="text-slate-400">Vue d'ensemble de tous les comptes : admins, clients payants et comptes gratuits.</p>
       </div>
 
       <UsersTableClient initialUsers={users || []} />

@@ -170,11 +170,23 @@ export default function UsersTableClient({ initialUsers }: { initialUsers: any[]
                         <div className="text-xs text-slate-400">{user.email}</div>
                       </td>
                       <td>
-                        {user.is_admin ? <span className="badge-member bg-indigo-500/10 text-indigo-400 border-indigo-500/20"><Shield size={12} className="inline mr-1" />Admin</span> : <span className="text-slate-400 text-xs text-opacity-70">Client</span>}
+                        {user.is_admin ? (
+                          <span className="badge-member bg-indigo-500/10 text-indigo-400 border-indigo-500/20">
+                            <Shield size={12} className="inline mr-1" />Admin
+                          </span>
+                        ) : isActive ? (
+                          <span className="badge-member bg-emerald-500/10 text-emerald-400 border-emerald-500/20">
+                            ✨ Payé
+                          </span>
+                        ) : (
+                          <span className="badge-member bg-slate-500/10 text-slate-400 border-slate-500/20">
+                            🆓 Gratuit
+                          </span>
+                        )}
                       </td>
                       <td>
                         <span className={`badge-member ${isActive ? 'active' : 'expired'}`}>
-                          {isActive ? 'Actif' : 'Inactif'}
+                          {isActive ? 'Abonnement Actif' : 'Pas d\'abonnement'}
                         </span>
                       </td>
                       <td>
