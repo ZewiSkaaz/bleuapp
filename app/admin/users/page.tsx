@@ -27,7 +27,7 @@ export default async function AdminUsersPage() {
     .select(`
       *,
       subscriptions(*),
-      mt5_accounts(count)
+      mt5_accounts(*)
     `)
     .order('created_at', { ascending: false })
 

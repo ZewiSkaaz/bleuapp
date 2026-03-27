@@ -1,13 +1,14 @@
 'use client'
 
 import { useState } from 'react'
-import { MoreVertical, Edit, Trash2, Shield, Search, Plus, UserPlus, CheckCircle, XCircle } from 'lucide-react'
+import { MoreVertical, Edit, Trash2, Shield, Search, Plus, UserPlus, CheckCircle, XCircle, ChevronDown, ChevronUp, Activity, Server, AlertCircle } from 'lucide-react'
 import ModalPortal from '@/components/ModalPortal'
 
 export default function UsersTableClient({ initialUsers }: { initialUsers: any[] }) {
   const [users, setUsers] = useState(initialUsers)
   const [loadingId, setLoadingId] = useState<string | null>(null)
   const [search, setSearch] = useState('')
+  const [expandedUserId, setExpandedUserId] = useState<string | null>(null)
 
   // Modals state
   const [isFormOpen, setIsFormOpen] = useState(false)
@@ -164,7 +165,8 @@ export default function UsersTableClient({ initialUsers }: { initialUsers: any[]
                   const isActive = user.subscriptions?.status === 'active' || user.subscriptions?.status === 'trialing'
                   
                   return (
-                    <tr key={user.id} className="hover:bg-white/5 transition-colors group">
+                    <>
+                    <tr key={user.id} className="hover:bg-white/5 transition-colors group cursor-pointer" onClick={() => setExpandedUserId(expandedUserId === user.id ? null : user.id)}>
                       <td>
                         <div className="font-semibold text-white">{user.full_name || 'Sans Nom'}</div>
                         <div className="text-xs text-slate-400">{user.email}</div>
@@ -231,9 +233,70 @@ export default function UsersTableClient({ initialUsers }: { initialUsers: any[]
                            >
                              <Trash2 size={16} />
                            </button>
+
+                           {/* Expand toggle */}
+                           <button 
+                             type="button"
+                             className="p-2 text-slate-400 hover:text-white transition-colors"
+                           >
+                             {expandedUserId === user.id ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+                           </button>
                         </div>
                       </td>
                     </tr>
+                    
+                    {/* Expanded MT5 Details Row */}
+                    {expandedUserId === user.id && (
+                      <tr className="bg-[#1e293b]/50 border-b border-[#334155]/50 animate-fade-in relative z-10 shadow-inner">
+                        <td colSpan={4} className="px-6 py-6">
+                          <div className="flex items-center justify-between mb-4">
+                            <div className="flex items-center gap-2 text-sm font-semibold text-slate-300 uppercase tracking-wider">
+                              <Activity size={16} className="text-blue-400" />
+                              Comptes MT5 Connectés ({user.mt5_accounts?.length || 0})
+                            </div>
+                          </div>
+                          
+                          {(!user.mt5_accounts || user.mt5_accounts.length === 0) ? (
+                            <div className="text-slate-500 text-sm italic flex items-center gap-2 bg-slate-800/50 p-4 rounded-xl border border-dashed border-slate-700 w-max">
+                              <AlertCircle size={14} className="text-amber-500" /> Ce client n'a connecté aucun compte MetaTrader.
+                            </div>
+                          ) : (
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                              {user.mt5_accounts.map((acc: any) => (
+                                <div key={acc.id} className="bg-[#0f172a] p-5 rounded-2xl border border-white/10 relative overflow-hidden group shadow-lg">
+                                  {/* Connection Status indicator */}
+                                  <div className="absolute top-0 right-0 p-4">
+                                    <div className={`w-2.5 h-2.5 rounded-full ${acc.is_active ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.5)]'}`}></div>
+                                  </div>
+                                  
+                                  <div className="flex items-center gap-2 text-blue-400 font-bold text-lg mb-1">
+                                    <Server size={18} />
+                                    {acc.broker_name || 'Broker Inconnu'}
+                                  </div>
+                                  <div className="text-slate-300 font-mono text-base mb-4 bg-white/5 inline-block px-3 py-1 rounded-md">
+                                    {acc.account_number}
+                                  </div>
+                                  
+                                  <div className="text-sm text-slate-400 space-y-2">
+                                    <div className="flex justify-between border-b border-white/5 pb-2">
+                                      <span>Serveur:</span>
+                                      <span className="text-white font-medium">{acc.server_name || 'Non spécifié'}</span>
+                                    </div>
+                                    <div className="flex justify-between border-b border-white/5 pb-2">
+                                      <span>ID MetaAPI:</span>
+                                      <span className="text-emerald-400 font-mono truncate max-w-[120px] text-right" title={acc.metaapi_account_id}>
+                                        {acc.metaapi_account_id ? 'Connecté' : 'Non provisionné'}
+                                      </span>
+                                    </div>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </td>
+                      </tr>
+                    )}
+                    </>
                   )
                 })
               ) : (

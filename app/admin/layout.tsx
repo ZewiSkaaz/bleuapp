@@ -6,11 +6,10 @@ import { usePathname } from 'next/navigation';
 import { 
   Terminal, 
   Users, 
-  Zap, 
-  Database,
+  MessageSquare, 
   LayoutDashboard,
   Settings,
-  BookOpen,
+  HelpCircle,
   LogOut,
   Menu,
   X
@@ -24,11 +23,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const navItems = [
     { name: 'Control Center', href: '/admin/dashboard', icon: LayoutDashboard },
     { name: 'Membres & Accès', href: '/admin/users', icon: Users },
-    { name: 'Canaux Telegram', href: '/admin/telegram-channels', icon: Zap },
-    { name: 'Comptes MT5 Clients', href: '/admin/mt5-accounts', icon: Database },
+    { name: 'Canaux Telegram', href: '/admin/telegram-channels', icon: MessageSquare },
     { name: 'Logs & Terminal', href: '/admin/logs', icon: Terminal },
-    { name: 'Paramètres', href: '/admin/copy-trading', icon: Settings },
-    { name: 'Aide & Onboarding', href: '/admin/aide', icon: BookOpen },
+    { name: 'Paramètres', href: '/admin/settings', icon: Settings },
+    { name: 'Aide & Onboarding', href: '/admin/aide', icon: HelpCircle },
   ];
 
   return (
