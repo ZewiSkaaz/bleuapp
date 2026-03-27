@@ -4,10 +4,7 @@ import { useEffect, useState, lazy, Suspense, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import Navbar from "@/components/Navbar";
-import { clientCache } from "@/lib/cache";
-
-// Lazy load des composants lourds
-const LoadingSpinner = lazy(() => import("@/components/LoadingSpinner"));
+import { Server, Activity, AlertCircle, Plus, ChevronDown, RefreshCw, Trash2, Power } from "lucide-react";
 
 type Broker = {
   id: string;
@@ -34,18 +31,6 @@ type Position = {
   profit: number;
   stopLoss?: number;
   takeProfit?: number;
-};
-
-type AccountInfo = {
-  balance: number;
-  equity: number;
-  margin: number;
-  freeMargin: number;
-  marginLevel: number;
-  currency: string;
-  profit: number;
-  server: string;
-  leverage: number;
 };
 
 export default function MT5AccountsPage() {
@@ -114,7 +99,6 @@ export default function MT5AccountsPage() {
         return;
       }
 
-      // Fetch profile for admin status
       const { data: profileData } = await supabase
         .from("profiles")
         .select("is_admin")
@@ -142,7 +126,6 @@ export default function MT5AccountsPage() {
         }));
         setMt5Accounts(formattedAccounts);
 
-        // Charger les positions du premier compte actif
         const activeAccount = formattedAccounts.find(
           (acc: any) => acc.is_active && acc.metaapi_account_id
         );
@@ -167,7 +150,6 @@ export default function MT5AccountsPage() {
       if (data.success && data.brokers) {
         setBrokers(data.brokers);
       } else {
-        // Fallback si l'API ne marche pas
         setBrokers(data.brokers || []);
       }
     } catch (err) {
@@ -187,7 +169,6 @@ export default function MT5AccountsPage() {
       if (data.success && data.servers) {
         setServers(data.servers.map((s: any) => s.name));
       } else {
-        // Fallback: utiliser les serveurs du broker sélectionné
         const broker = brokers.find((b) => b.name === brokerName);
         setServers(broker?.servers || []);
       }
@@ -226,14 +207,12 @@ export default function MT5AccountsPage() {
 
       if (!session) throw new Error("Non authentifié");
 
-      // Vérifier que l'utilisateur n'a pas déjà un compte
       if (mt5Accounts.length > 0) {
         throw new Error(
           "Vous ne pouvez connecter qu'un seul compte MT5. Supprimez votre compte actuel pour en ajouter un nouveau."
         );
       }
 
-      // 1. Connecter le compte à MetaApi
       const metaApiResponse = await fetch("/api/metaapi/connect-account", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -255,7 +234,6 @@ export default function MT5AccountsPage() {
         );
       }
 
-      // 2. Enregistrer dans Supabase avec le metaapi_account_id
       const passwordEncrypted = Buffer.from(formData.password).toString(
         "base64"
       );
@@ -267,7 +245,7 @@ export default function MT5AccountsPage() {
         account_number: parseInt(formData.account_number),
         password_encrypted: passwordEncrypted,
         is_investor: formData.is_investor,
-        is_admin_account: false, // Compte user, pas admin
+        is_admin_account: false,
         metaapi_account_id: metaApiData.accountId,
         is_active: true,
       });
@@ -314,305 +292,331 @@ export default function MT5AccountsPage() {
     if (!error) fetchData();
   };
 
+  const inputClass = "w-full px-4 py-3 border border-white/10 rounded-xl focus:ring-2 focus:ring-blue-500 bg-[#0f172a] text-white transition-all outline-none";
+  const selectClass = "w-full px-4 py-3 border border-white/10 rounded-xl focus:ring-2 focus:ring-blue-500 bg-[#0f172a] text-white transition-all outline-none appearance-none";
+
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#0f172a] text-slate-200 font-sans pb-20 animate-fade-in relative overflow-hidden">
+      {/* Background Ornaments */}
+      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
+      <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-indigo-600/10 rounded-full blur-[120px] translate-y-1/2 -translate-x-1/2 pointer-events-none"></div>
+
       <Navbar isAdmin={profile?.is_admin} />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Mon Compte MT5</h1>
-          <div className="flex gap-2">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-6 mb-8 border-b border-white/10 pb-6">
+          <div>
+            <h1 className="text-3xl md:text-4xl font-extrabold bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent mb-2">
+              Mon Compte MT5
+            </h1>
+            <p className="text-slate-400 font-medium">Liez votre broker pour recevoir nos signaux automatisés.</p>
+          </div>
+          <div className="flex gap-3">
             <button
               onClick={() => fetchData(true)}
               disabled={isRefreshing}
-              className="btn btn-secondary"
+              className="px-4 py-2 border border-white/10 rounded-lg text-slate-300 hover:text-white hover:bg-white/5 transition-colors flex items-center gap-2 font-medium"
             >
-              {isRefreshing ? "🔄" : "↻"} Actualiser
+              <RefreshCw size={16} className={isRefreshing ? "animate-spin" : ""} /> 
+              Actualiser
             </button>
             {mt5Accounts.length === 0 && (
               <button
                 onClick={() => setShowAddForm(!showAddForm)}
-                className="btn btn-primary"
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-500 rounded-lg text-white font-semibold transition-colors shadow-lg shadow-blue-500/20 flex items-center gap-2"
               >
-                {showAddForm ? "Annuler" : "+ Connecter mon compte"}
+                {showAddForm ? "Annuler" : <><Plus size={18} /> Connecter</>}
               </button>
             )}
           </div>
         </div>
 
         {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-            {error}
+          <div className="bg-rose-500/10 border border-rose-500/30 text-rose-400 px-4 py-4 rounded-xl mb-6 flex items-start gap-3 backdrop-blur-md">
+            <AlertCircle className="shrink-0 mt-0.5" size={18} />
+            <p className="font-medium text-sm">{error}</p>
           </div>
         )}
 
         {showAddForm && (
-          <div className="card mb-8">
-            <h2 className="text-xl font-bold mb-4">Nouveau Compte MT5</h2>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium mb-2">
-                  Broker *
-                </label>
-                <select
-                  value={formData.broker_name}
-                  onChange={(e) => handleBrokerChange(e.target.value)}
-                  className="input"
-                  required
-                >
-                  <option value="">Sélectionner un broker</option>
-                  {brokers.map((broker) => (
-                    <option key={broker.id} value={broker.name}>
-                      {broker.name}
-                    </option>
-                  ))}
-                </select>
-                <p className="text-xs text-gray-500 mt-1">
-                  {brokers.length > 0
-                    ? `${brokers.length} brokers disponibles`
-                    : "Chargement des brokers..."}
-                </p>
-              </div>
-
-              {formData.broker_name && (
+          <div className="glass-panel p-6 sm:p-8 mb-8 animate-fade-in">
+            <h2 className="text-xl font-bold mb-6 text-white flex items-center gap-2 border-b border-white/5 pb-4">
+              <Server size={20} className="text-blue-400" /> Ajouter une connexion
+            </h2>
+            <form onSubmit={handleSubmit} className="space-y-5">
+              <div className="grid sm:grid-cols-2 gap-5">
                 <div>
-                  <div className="flex justify-between items-center mb-2">
-                    <label className="block text-sm font-medium">
-                      Serveur MT5 *
-                    </label>
-                    {!loadingServers && servers.length > 0 && (
-                      <button
-                        type="button"
-                        onClick={() => setManualServerInput(!manualServerInput)}
-                        className="text-xs text-blue-600 hover:text-blue-800 underline"
-                      >
-                        {manualServerInput
-                          ? "Utiliser la liste"
-                          : "Saisir manuellement"}
-                      </button>
+                  <label className="block text-sm font-semibold text-slate-300 mb-2">
+                    Broker <span className="text-rose-400">*</span>
+                  </label>
+                  <div className="relative">
+                    <select
+                      value={formData.broker_name}
+                      onChange={(e) => handleBrokerChange(e.target.value)}
+                      className={selectClass}
+                      required
+                    >
+                      <option value="">Sélectionner un broker</option>
+                      {brokers.map((broker) => (
+                        <option key={broker.id} value={broker.name}>
+                          {broker.name}
+                        </option>
+                      ))}
+                    </select>
+                    <ChevronDown size={16} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none" />
+                  </div>
+                  <p className="text-xs text-slate-500 mt-2 font-medium">
+                    {brokers.length > 0
+                      ? `${brokers.length} brokers supportés officiellement`
+                      : "Chargement des brokers..."}
+                  </p>
+                </div>
+
+                {formData.broker_name && (
+                  <div>
+                    <div className="flex justify-between items-center mb-2">
+                      <label className="block text-sm font-semibold text-slate-300">
+                        Serveur MT5 <span className="text-rose-400">*</span>
+                      </label>
+                      {!loadingServers && servers.length > 0 && (
+                        <button
+                          type="button"
+                          onClick={() => setManualServerInput(!manualServerInput)}
+                          className="text-xs text-blue-400 hover:text-blue-300 transition-colors"
+                        >
+                          {manualServerInput
+                            ? "Utiliser la liste"
+                            : "Saisir manuellement"}
+                        </button>
+                      )}
+                    </div>
+                    {loadingServers ? (
+                      <div className="w-full px-4 py-3 border border-white/10 rounded-xl bg-[#0f172a] text-slate-500 flex items-center gap-2">
+                        <RefreshCw size={14} className="animate-spin" /> Chargement...
+                      </div>
+                    ) : manualServerInput || servers.length === 0 ? (
+                      <>
+                        <input
+                          type="text"
+                          value={formData.server_name}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              server_name: e.target.value,
+                            })
+                          }
+                          className={inputClass}
+                          placeholder="Ex: VTMarkets-Live"
+                          required
+                        />
+                        <p className="text-xs text-slate-500 mt-2">
+                          Entrez le nom exact du serveur (sensible à la casse)
+                        </p>
+                      </>
+                    ) : (
+                      <div className="relative">
+                        <select
+                          value={formData.server_name}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              server_name: e.target.value,
+                            })
+                          }
+                          className={selectClass}
+                          required
+                        >
+                          <option value="">Sélectionner un serveur</option>
+                          {servers.map((server) => (
+                            <option key={server} value={server}>
+                              {server}
+                            </option>
+                          ))}
+                        </select>
+                        <ChevronDown size={16} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none" />
+                      </div>
                     )}
                   </div>
-                  {loadingServers ? (
-                    <div className="input bg-gray-50">
-                      Chargement des serveurs...
-                    </div>
-                  ) : manualServerInput || servers.length === 0 ? (
-                    <>
-                      <input
-                        type="text"
-                        value={formData.server_name}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            server_name: e.target.value,
-                          })
-                        }
-                        className="input"
-                        placeholder="Ex: RaiseGlobal-Live"
-                        required
-                      />
-                      <p className="text-xs text-gray-500 mt-1">
-                        Entrez le nom exact du serveur (visible dans MT5)
-                      </p>
-                    </>
-                  ) : (
-                    <>
-                      <select
-                        value={formData.server_name}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            server_name: e.target.value,
-                          })
-                        }
-                        className="input"
-                        required
-                      >
-                        <option value="">Sélectionner un serveur</option>
-                        {servers.map((server) => (
-                          <option key={server} value={server}>
-                            {server}
-                          </option>
-                        ))}
-                      </select>
-                      <p className="text-xs text-gray-500 mt-1">
-                        {servers.length} serveurs disponibles
-                      </p>
-                    </>
-                  )}
+                )}
+
+                <div>
+                  <label className="block text-sm font-semibold text-slate-300 mb-2">
+                    Numéro de compte <span className="text-rose-400">*</span>
+                  </label>
+                  <input
+                    type="number"
+                    value={formData.account_number}
+                    onChange={(e) =>
+                      setFormData({ ...formData, account_number: e.target.value })
+                    }
+                    className={inputClass}
+                    placeholder="Login (Ex: 123456)"
+                    required
+                  />
                 </div>
-              )}
 
-              <div>
-                <label className="block text-sm font-medium mb-2">
-                  Numéro de compte MT5 *
-                </label>
-                <input
-                  type="number"
-                  value={formData.account_number}
-                  onChange={(e) =>
-                    setFormData({ ...formData, account_number: e.target.value })
-                  }
-                  className="input"
-                  placeholder="12345678"
-                  required
-                />
+                <div>
+                  <label className="block text-sm font-semibold text-slate-300 mb-2">
+                    Mot de passe principal <span className="text-rose-400">*</span>
+                  </label>
+                  <input
+                    type="password"
+                    value={formData.password}
+                    onChange={(e) =>
+                      setFormData({ ...formData, password: e.target.value })
+                    }
+                    className={inputClass}
+                    placeholder="••••••••"
+                    required
+                  />
+                </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium mb-2">
-                  Mot de passe MT5 *
-                </label>
-                <input
-                  type="password"
-                  value={formData.password}
-                  onChange={(e) =>
-                    setFormData({ ...formData, password: e.target.value })
-                  }
-                  className="input"
-                  placeholder="Votre mot de passe MT5"
-                  required
-                />
-              </div>
-
-              <div className="flex items-center">
+              <div className="flex items-start gap-3 pt-2">
                 <input
                   type="checkbox"
+                  id="investor_check"
                   checked={formData.is_investor}
                   onChange={(e) =>
                     setFormData({ ...formData, is_investor: e.target.checked })
                   }
-                  className="mr-2"
+                  className="mt-1 w-4 h-4 rounded border-slate-600 outline-none bg-[#0f172a] text-blue-500 focus:ring-blue-500 focus:ring-offset-0 focus:ring-offset-[#1e293b]"
                 />
-                <label className="text-sm">
-                  Mot de passe investisseur (lecture seule)
+                <label htmlFor="investor_check" className="text-sm text-slate-400 leading-tight">
+                  <strong className="text-slate-300 block mb-1">Mot de passe Investisseur</strong>
+                  Cochez cette case si le mot de passe fourni est en lecture seule (le copy trading sera désactivé).
                 </label>
               </div>
 
-              <button
-                type="submit"
-                disabled={loadingSubmit || !formData.server_name}
-                className="btn btn-primary w-full"
-              >
-                {loadingSubmit ? "Ajout en cours..." : "Ajouter le compte"}
-              </button>
+              <div className="pt-4 border-t border-white/5">
+                <button
+                  type="submit"
+                  disabled={loadingSubmit || !formData.server_name}
+                  className="w-full sm:w-auto py-3 px-8 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl text-white font-bold transition-all shadow-lg shadow-blue-500/20"
+                >
+                  {loadingSubmit ? "Connexion en cours..." : "Valider la Connexion"}
+                </button>
+              </div>
             </form>
           </div>
         )}
 
         {mt5Accounts.length > 0 ? (
-          <div className="space-y-6">
+          <div className="space-y-8">
             {mt5Accounts.map((account) => {
               return (
-                <div key={account.id} className="card">
-                  <div className="flex justify-between items-center mb-4">
-                    <div className="flex-1">
-                      <h3 className="text-xl font-bold text-gray-900 mb-1">
-                        {account.broker_name}
-                      </h3>
-                      <p className="text-gray-600 font-semibold">
-                        Serveur: {account.server_name}
-                      </p>
-                      <p className="text-gray-600 font-semibold">
-                        Compte: #{account.account_number}
-                      </p>
+                <div key={account.id} className="glass-panel overflow-hidden border-2 border-primary-500/30">
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-6 gap-4 bg-white/5 border-b border-white/10">
+                    <div>
+                      <div className="flex items-center gap-3 mb-2">
+                        <Server className="text-blue-400" size={20} />
+                        <h3 className="text-xl font-bold text-white tracking-tight">
+                          {account.broker_name}
+                        </h3>
+                        {account.is_active ? (
+                          <span className="px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shadow-[0_0_10px_rgba(16,185,129,0.2)]">
+                            En direct
+                          </span>
+                        ) : (
+                          <span className="px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase bg-slate-500/10 text-slate-400 border border-slate-500/20">
+                            Suspendu
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-slate-400">
+                        <p><span className="opacity-70">Serveur:</span> <span className="font-medium text-slate-300">{account.server_name}</span></p>
+                        <p><span className="opacity-70">Login:</span> <span className="font-mono text-slate-300 bg-[#0f172a] px-2 py-0.5 rounded">{account.account_number}</span></p>
+                      </div>
                     </div>
-                    <span
-                      className={`px-4 py-2 rounded-full text-sm font-bold ${
-                        account.is_active
-                          ? "bg-green-500 text-white"
-                          : "bg-gray-400 text-white"
-                      }`}
-                    >
-                      {account.is_active ? "✓ Actif" : "✗ Inactif"}
-                    </span>
-                  </div>
 
-                  <div className="flex gap-2 pt-4 border-t">
-                    <button
-                      onClick={() =>
-                        toggleAccountStatus(account.id, account.is_active)
-                      }
-                      className="flex-1 px-4 py-2 bg-blue-500 text-white rounded-lg font-bold hover:bg-blue-600 transition-all"
-                    >
-                      {account.is_active ? "Désactiver" : "Activer"}
-                    </button>
+                    <div className="flex items-center gap-2 w-full sm:w-auto mt-2 sm:mt-0">
+                      <button
+                        onClick={() => toggleAccountStatus(account.id, account.is_active)}
+                        className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 border rounded-lg text-sm font-semibold transition-all ${
+                          account.is_active 
+                            ? 'border-amber-500/30 text-amber-400 hover:bg-amber-500/10' 
+                            : 'border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10'
+                        }`}
+                      >
+                        <Power size={14} />
+                        {account.is_active ? "Suspendre" : "Activer"}
+                      </button>
 
-                    <button
-                      onClick={() => deleteAccount(account.id)}
-                      className="flex-1 px-4 py-2 bg-red-500 text-white rounded-lg font-bold hover:bg-red-600 transition-all"
-                    >
-                      Supprimer
-                    </button>
+                      <button
+                        onClick={() => deleteAccount(account.id)}
+                        className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 bg-rose-500/10 border border-rose-500/20 text-rose-400 hover:bg-rose-500/20 rounded-lg text-sm font-semibold transition-all"
+                      >
+                        <Trash2 size={14} />
+                        Délier
+                      </button>
+                    </div>
                   </div>
                 </div>
               );
             })}
 
-            <div className="bg-blue-50 border-2 border-blue-400 rounded-lg p-4">
-              <p className="text-sm font-bold text-blue-800">
-                ℹ️ <strong>Limite:</strong> Vous ne pouvez connecter qu'un seul
-                compte MT5. Pour en changer, supprimez d'abord votre compte
-                actuel.
+            <div className="bg-blue-500/10 border border-blue-500/30 rounded-xl p-4 flex gap-3 backdrop-blur-sm">
+              <AlertCircle className="text-blue-400 shrink-0 mt-0.5" size={18} />
+              <p className="text-sm font-medium text-blue-200">
+                Vous ne pouvez connecter qu'un seul compte de supervision MT5 dans votre formule actuelle. Pour le modifier, veuillez d'abord le délier.
               </p>
             </div>
 
             {/* Positions ouvertes */}
-            <div className="card mt-6">
-              <h2 className="text-2xl font-bold mb-4">Positions ouvertes</h2>
+            <div className="glass-panel p-6 sm:p-8">
+              <div className="flex items-center gap-2 mb-6 border-b border-white/5 pb-4">
+                <Activity size={20} className="text-indigo-400" />
+                <h2 className="text-xl font-bold text-white">Positions Courantes</h2>
+              </div>
+              
               {loadingPositions ? (
-                <p className="text-gray-600">Chargement des positions...</p>
+                <div className="flex items-center gap-3 text-slate-400 py-8 justify-center">
+                  <RefreshCw size={18} className="animate-spin text-blue-500" /> 
+                  <p className="font-medium">Synchronisation Terminal...</p>
+                </div>
               ) : positions.length > 0 ? (
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead className="bg-gray-100">
+                <div className="overflow-x-auto -mx-6 sm:mx-0">
+                  <table className="w-full text-left border-collapse min-w-[600px]">
+                    <thead>
                       <tr>
-                        <th className="px-4 py-2 text-left">Symbole</th>
-                        <th className="px-4 py-2 text-left">Type</th>
-                        <th className="px-4 py-2 text-right">Volume</th>
-                        <th className="px-4 py-2 text-right">Entrée</th>
-                        <th className="px-4 py-2 text-right">Prix actuel</th>
-                        <th className="px-4 py-2 text-right">SL</th>
-                        <th className="px-4 py-2 text-right">TP</th>
-                        <th className="px-4 py-2 text-right">P&L</th>
+                        <th className="px-6 sm:px-4 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider border-b border-white/10">Actif</th>
+                        <th className="px-4 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider border-b border-white/10">Type</th>
+                        <th className="px-4 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider border-b border-white/10 text-right">Lots</th>
+                        <th className="px-4 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider border-b border-white/10 text-right">Ouverture</th>
+                        <th className="px-4 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider border-b border-white/10 text-right">Actuel</th>
+                        <th className="px-4 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider border-b border-white/10 text-right">P&L</th>
                       </tr>
                     </thead>
-                    <tbody>
+                    <tbody className="divide-y divide-white/5">
                       {positions.map((pos) => (
-                        <tr key={pos.id} className="border-b">
-                          <td className="px-4 py-3 font-bold">{pos.symbol}</td>
-                          <td className="px-4 py-3">
+                        <tr key={pos.id} className="hover:bg-white/5 transition-colors group">
+                          <td className="px-6 sm:px-4 py-4 font-bold text-white">{pos.symbol}</td>
+                          <td className="px-4 py-4">
                             <span
-                              className={`px-2 py-1 rounded text-white text-xs ${
+                              className={`px-2.5 py-1 rounded text-[10px] font-black tracking-wider uppercase ${
                                 pos.type === "ORDER_TYPE_BUY"
-                                  ? "bg-green-500"
-                                  : "bg-red-500"
+                                  ? "bg-blue-500/20 text-blue-400 border border-blue-500/30"
+                                  : "bg-rose-500/20 text-rose-400 border border-rose-500/30"
                               }`}
                             >
                               {pos.type === "ORDER_TYPE_BUY" ? "BUY" : "SELL"}
                             </span>
                           </td>
-                          <td className="px-4 py-3 text-right">{pos.volume}</td>
-                          <td className="px-4 py-3 text-right">
-                            {pos.openPrice?.toFixed(2)}
+                          <td className="px-4 py-4 text-right font-mono text-sm text-slate-300">{pos.volume}</td>
+                          <td className="px-4 py-4 text-right font-mono text-sm text-slate-400">
+                            {pos.openPrice?.toFixed(5)}
                           </td>
-                          <td className="px-4 py-3 text-right">
-                            {pos.currentPrice?.toFixed(2)}
-                          </td>
-                          <td className="px-4 py-3 text-right">
-                            {pos.stopLoss?.toFixed(2) || "-"}
-                          </td>
-                          <td className="px-4 py-3 text-right">
-                            {pos.takeProfit?.toFixed(2) || "-"}
+                          <td className="px-4 py-4 text-right font-mono text-sm text-slate-300">
+                            {pos.currentPrice?.toFixed(5)}
                           </td>
                           <td
-                            className={`px-4 py-3 text-right font-bold ${
+                            className={`px-4 py-4 text-right font-mono font-bold ${
                               pos.profit >= 0
-                                ? "text-green-600"
-                                : "text-red-600"
+                                ? "text-emerald-400"
+                                : "text-rose-400"
                             }`}
                           >
-                            ${pos.profit?.toFixed(2)}
+                            {pos.profit >= 0 ? "+" : ""}${pos.profit?.toFixed(2)}
                           </td>
                         </tr>
                       ))}
@@ -620,18 +624,23 @@ export default function MT5AccountsPage() {
                   </table>
                 </div>
               ) : (
-                <p className="text-gray-600">Aucune position ouverte</p>
+                <div className="text-center py-10">
+                  <p className="font-semibold text-slate-400 mb-1">Aucune position ouverte</p>
+                  <p className="text-sm text-slate-500">Le terminal MT5 signale que toutes vos positions sont flaggées comme fermées.</p>
+                </div>
               )}
             </div>
           </div>
         ) : (
-          <div className="card text-center py-12">
-            <p className="text-xl font-bold text-gray-900 mb-2">
-              Aucun compte MT5 connecté
-            </p>
-            <p className="text-gray-600 mb-4">
-              Connectez votre compte MT5 pour recevoir automatiquement les
-              signaux de trading
+          <div className="glass-panel text-center py-16 px-4">
+            <div className="w-16 h-16 bg-blue-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
+              <Server size={32} className="text-blue-400" />
+            </div>
+            <h2 className="text-2xl font-bold text-white mb-3">
+              Aucun Terminal Connecté
+            </h2>
+            <p className="text-slate-400 max-w-md mx-auto">
+              Liez votre compte MetaTrader 5 via notre interconnexion sécurisée MetaAPI pour synchroniser vos signaux en millisecondes.
             </p>
           </div>
         )}

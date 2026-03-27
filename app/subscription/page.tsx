@@ -172,7 +172,7 @@ export default function SubscriptionPage() {
             </div>
             
             <h2 className="text-3xl font-black mb-2" style={{ color: '#1d4ed8' }}>🔹 Plan Basique</h2>
-            <p className="text-gray-500 font-bold mb-8 text-lg">Tout ce dont vous avez besoin pour copier Sadek</p>
+            <p className="text-gray-500 font-bold mb-8 text-lg">Tout ce dont vous avez besoin pour copier nos experts</p>
             
             <div className="mb-8 flex items-baseline gap-2">
               <span className="text-6xl font-black text-gray-900">29,99€</span>
